@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>IDESourceControlProjectFavoriteDictionaryKey</key>
+	<false/>
+	<key>IDESourceControlProjectIdentifier</key>
+	<string>01B9C8B3-5280-4601-B24B-7E6ADE800FF1</string>
+	<key>IDESourceControlProjectName</key>
+	<string>AwesomeProject</string>
+	<key>IDESourceControlProjectOriginsDictionary</key>
+	<dict>
+		<key>915DD91B7AD8BD4F36EB7E8B98DCD19E45A96DA0</key>
+		<string>github.com:wtfil/reader.git</string>
+	</dict>
+	<key>IDESourceControlProjectPath</key>
+	<string>AwesomeProject.xcodeproj</string>
+	<key>IDESourceControlProjectRelativeInstallPathDictionary</key>
+	<dict>
+		<key>915DD91B7AD8BD4F36EB7E8B98DCD19E45A96DA0</key>
+		<string>../..</string>
+	</dict>
+	<key>IDESourceControlProjectURL</key>
+	<string>github.com:wtfil/reader.git</string>
+	<key>IDESourceControlProjectVersion</key>
+	<integer>111</integer>
+	<key>IDESourceControlProjectWCCIdentifier</key>
+	<string>915DD91B7AD8BD4F36EB7E8B98DCD19E45A96DA0</string>
+	<key>IDESourceControlProjectWCConfigurations</key>
+	<array>
+		<dict>
+			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
+			<string>public.vcs.git</string>
+			<key>IDESourceControlWCCIdentifierKey</key>
+			<string>915DD91B7AD8BD4F36EB7E8B98DCD19E45A96DA0</string>
+			<key>IDESourceControlWCCName</key>
+			<string>AwesomeProject</string>
+		</dict>
+	</array>
+</dict>
+</plist>
