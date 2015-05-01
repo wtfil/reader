@@ -5,15 +5,13 @@
 'use strict';
 
 var React = require('react-native');
+var sqlite = require('react-native-sqlite');
 var {
   	AppRegistry,
   	StyleSheet,
   	Text,
-  	View,
-  	AsyncStorage
+  	View
 } = React;
-AsyncStorage.setItem('start', Date.now());
-console.log(AsyncStorage);
 
 var AwesomeProject = React.createClass({
   	render: function() {
