@@ -23,6 +23,7 @@
 		832341BD1AAA6AB300B99B32 /* libRCTText.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 832341B51AAA6A8300B99B32 /* libRCTText.a */; };
 		88FA44AD1AF40CDB00DCC44B /* libAIBSQLite.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 88FA44AC1AF40CD500DCC44B /* libAIBSQLite.a */; };
 		88FA44AF1AF40DE500DCC44B /* libsqlite3.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 88FA44AE1AF40DE500DCC44B /* libsqlite3.dylib */; };
+		88FA44B51AF44B3200DCC44B /* FileUtil.m in Sources */ = {isa = PBXBuildFile; fileRef = 88FA44B41AF44B3200DCC44B /* FileUtil.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -119,6 +120,8 @@
 		88FA447F1AF408A900DCC44B /* libedit.3.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libedit.3.dylib; path = usr/lib/libedit.3.dylib; sourceTree = SDKROOT; };
 		88FA44A71AF40CD500DCC44B /* AIBSQLite.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = AIBSQLite.xcodeproj; path = "node_modules/react-native-sqlite/AIBSQLite.xcodeproj"; sourceTree = "<group>"; };
 		88FA44AE1AF40DE500DCC44B /* libsqlite3.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libsqlite3.dylib; path = usr/lib/libsqlite3.dylib; sourceTree = SDKROOT; };
+		88FA44B31AF44B3200DCC44B /* FileUtil.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = FileUtil.h; path = iOS/FileUtil.h; sourceTree = "<group>"; };
+		88FA44B41AF44B3200DCC44B /* FileUtil.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = FileUtil.m; path = iOS/FileUtil.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -249,6 +252,8 @@
 		83CBB9F61A601CBA00E9B192 = {
 			isa = PBXGroup;
 			children = (
+				88FA44B31AF44B3200DCC44B /* FileUtil.h */,
+				88FA44B41AF44B3200DCC44B /* FileUtil.m */,
 				88FA44AE1AF40DE500DCC44B /* libsqlite3.dylib */,
 				88FA447F1AF408A900DCC44B /* libedit.3.dylib */,
 				13B07FAE1A68108700A75B9A /* AwesomeProject */,
@@ -453,6 +458,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				88FA44B51AF44B3200DCC44B /* FileUtil.m in Sources */,
 				13B07FBC1A68108700A75B9A /* AppDelegate.m in Sources */,
 				13B07FC11A68108700A75B9A /* main.m in Sources */,
 			);
@@ -478,6 +484,7 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_MODULES = YES;
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
@@ -488,6 +495,8 @@
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = AwesomeProject;
 				SKIP_INSTALL = NO;
+				SWIFT_OBJC_BRIDGING_HEADER = "AwesomeProject-Bridging-Header.h";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
 			name = Debug;
 		};
@@ -496,6 +505,7 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_MODULES = YES;
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
@@ -506,6 +516,7 @@
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = AwesomeProject;
 				SKIP_INSTALL = NO;
+				SWIFT_OBJC_BRIDGING_HEADER = "AwesomeProject-Bridging-Header.h";
 			};
 			name = Release;
 		};
