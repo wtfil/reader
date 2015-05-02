@@ -10,36 +10,52 @@
 
 @implementation FileUtil
 
+
 RCT_EXPORT_MODULE()
 
-RCT_EXPORT_METHOD(readFile:(NSString *)fileName
-                  errorCallback:(RCTResponseSenderBlock)failureCallback
-                  callback:(RCTResponseSenderBlock)successCallback) {
-    
-    // Create an array of directory Paths, to allow us to get the documents directory
+NSString* getDocumentsRoot() {
     NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+    return [paths objectAtIndex:0];
+}
+
+
+RCT_EXPORT_METHOD(readDir: (NSString *)dirName
+                  errorCallback: (RCTResponseSenderBlock)failureCallback
+                  callback: (RCTResponseSenderBlock)successCallback
+                  ) {
     
-    // The documents directory is the first item
-    NSString *documentsDirectory = [paths objectAtIndex:0];
+    NSString *documentsDirectory = getDocumentsRoot();
+    dirName = [NSString stringWithFormat:@"%@/%@", documentsDirectory, dirName];
+    NSError *error;
+    NSArray* dir = [[NSFileManager defaultManager]
+                    contentsOfDirectoryAtPath: dirName
+                    error: &error];
+
+    if (error) {
+        failureCallback(@[[error localizedDescription]]);
+    } else {
+        successCallback(@[dir]);
+    }
+}
+
+
+RCT_EXPORT_METHOD(readFile: (NSString *)fileName
+                  errorCallback: (RCTResponseSenderBlock)failureCallback
+                  callback: (RCTResponseSenderBlock)successCallback) {
     
-    // Create a string that prepends the documents directory path to a text file name
-    // using NSString's stringWithFormat method.
+    NSString *documentsDirectory = getDocumentsRoot();
+    
     fileName = [NSString stringWithFormat:@"%@/%@", documentsDirectory, fileName];
+    NSError *error;
     
-    // Initialize an NSError variable
-    NSError *readError;
-    
-    // Allocate a string and initialize it with the contents of the file via
-    // the initWithContentsOfFile instance method.
     NSString *fileContents = [[NSString alloc]
                               initWithContentsOfFile: fileName
                               usedEncoding : nil
-                              error: &readError
-                              ];
+                              error: &error];
+                              
     
-
-    if (readError) {
-        failureCallback(@[[readError localizedDescription]]);
+    if (error) {
+        failureCallback(@[[error localizedDescription]]);
     } else {
         successCallback(@[fileContents]);
     }

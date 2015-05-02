@@ -1,34 +1,41 @@
 'use strict';
 
 var React = require('react-native');
-var {
-  	AppRegistry,
-  	StyleSheet,
-  	Text,
-  	View
-} = React;
-
+var {AppRegistry, StyleSheet, Text, View} = React;
 var {FileUtil} = require('NativeModules');
-FileUtil.readFile('book-1.txt', function (err) {
-	console.error(err);
-}, function (data) {
-	console.log(data);
-});
 
-var AwesomeProject = React.createClass({
-  	render: function() {
-    	return (
-      		<View style={styles.container}>
-        		<Text style={styles.welcome}>
-          			Welcome to React Native!
-        		</Text>
-        		<Text style={styles.instructions}>
-          			{new Date().toString() + '\n'}
-          			To get started, edit index.ios.js{'\n'}
-          			Press Cmd+R to reload
-        		</Text>
-      		</View>
-    	);
+function onError(err) {
+	console.error(err);
+}
+
+var Library = React.createClass({
+	getInitialState() {
+		return {books: []};
+	},
+	componentWillMount() {
+		FileUtil.readDir('books', onError, data => {
+			this.setState({books: data});
+		});
+	},
+	render() {
+		return <View style={styles.container}>
+			{this.state.books.map(book => <Text>{book}</Text>)}
+		</View>;
+	}
+});
+var BookReader = React.createClass({
+	getInitialState() {
+		return {book: ''};
+	},
+	componentWillMount() {
+		FileUtil.readFile('books/book-1.txt', onError, data => {
+			this.setState({book: data});
+		});
+	},
+	render() {
+		return <View style={styles.container}>
+			<Text>{this.state.book.slice(0, 10000)}</Text>
+		</View>;
   	}
 });
 
@@ -50,4 +57,4 @@ var styles = StyleSheet.create({
   	}
 });
 
-AppRegistry.registerComponent('AwesomeProject', () => AwesomeProject);
+AppRegistry.registerComponent('AwesomeProject', () => Library);
