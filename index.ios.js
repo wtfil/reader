@@ -2,17 +2,8 @@
 
 var React = require('react-native');
 var {TouchableOpacity, ListView, Navigator, AppRegistry, StyleSheet, Text, View} = React;
-var {ScreenUtil, FileUtil} = require('NativeModules');
-
-function onError(err) {
-	console.error(err);
-}
-
-function setResponder() {
-	return true;
-}
-console.log(ScreenUtil.width);
-console.log(ScreenUtil.height);
+var {FileUtil} = require('NativeModules');
+var BookReader = require('./js/BookReader');
 
 function arrToDS(arr) {
 	var ds = new ListView.DataSource({
@@ -67,37 +58,6 @@ class Library extends React.Component {
 	}
 }
 
-class BookReader extends React.Component {
-	constructor() {
-		this.state = {
-			book: null,
-			offset: 0
-		};
-	}
-	componentWillMount() {
-		FileUtil.readFile('books/' + this.props.bookName, onError, data => {
-			this.setState({book: data});
-		});
-	}
-	onPress() {
-		this.setState({
-			offset: this.state.offset + 100
-		});
-	}
-	render() {
-		return <View style={styles.bookReader}>
-			{this.state.book ?
-				<TouchableOpacity onPress={this.onPress.bind(this)}>
-					<Text>
-						{this.state.book.slice(this.state.offset, this.state.offset + 1000)}
-					</Text>
-				</TouchableOpacity> :
-				<Text>Loading...</Text>
-			}
-		</View>;
-  	}
-}
-
 class App extends React.Component {
 	renderScene(route, navigation) {
 		var Component = route.component;
@@ -116,9 +76,6 @@ class App extends React.Component {
 }
 
 var styles = StyleSheet.create({
-	bookReader: {
-		padding: 30
-	},
 	libraryHeader: {
 		fontSize: 18,
 		marginBottom: 10
