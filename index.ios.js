@@ -19,6 +19,18 @@ function arrToDS(arr) {
 	return ds.cloneWithRows(arr);
 }
 
+function readBooksDir(cb) {
+	FileUtil.readDir(
+		'books',
+		err => {
+			FileUtil.createDir('books', err => {
+				cb(err, []);
+			});
+		},
+		data => { cb(null, data); }
+	);
+}
+
 class Library extends React.Component {
 	constructor() {
 		this.state = {
@@ -26,10 +38,11 @@ class Library extends React.Component {
 		};
 	}
 	componentWillMount() {
-		FileUtil.readDir('books', onError, data => {
-			this.setState({
-				books: arrToDS(data)
-			});
+		readBooksDir((err, books) => {
+			if (err) {
+				return console.error(err);
+			}
+			this.setState({books: arrToDS(books)});
 		});
 	}
 	onBookTouch(bookName) {

@@ -52,7 +52,6 @@ RCT_EXPORT_METHOD(readFile: (NSString *)fileName
                               initWithContentsOfFile: fileName
                               usedEncoding : nil
                               error: &error];
-                              
     
     if (error) {
         failureCallback(@[[error localizedDescription]]);
@@ -60,5 +59,23 @@ RCT_EXPORT_METHOD(readFile: (NSString *)fileName
         successCallback(@[fileContents]);
     }
 }
+
+RCT_EXPORT_METHOD(createDir: (NSString *)dirName
+                  callback: (RCTResponseSenderBlock)callback) {
+
+    NSString *documentsDirectory = getDocumentsRoot();
+    dirName = [NSString stringWithFormat:@"%@/%@", documentsDirectory, dirName];
+    NSError *error;
+
+    [[NSFileManager defaultManager]
+        createDirectoryAtPath: dirName
+        withIntermediateDirectories: YES
+        attributes: nil
+        error: &error];
+    
+    callback(error ? @[[error localizedDescription]] : @[[NSNull null]]);
+}
+
+
 
 @end
