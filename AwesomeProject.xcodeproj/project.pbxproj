@@ -21,6 +21,7 @@
 		13B07FC11A68108700A75B9A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
 		146834051AC3E58100842450 /* libReact.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 146834041AC3E56700842450 /* libReact.a */; };
 		832341BD1AAA6AB300B99B32 /* libRCTText.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 832341B51AAA6A8300B99B32 /* libRCTText.a */; };
+		88660B781AF6CBA3002B795F /* ScreenUtil.m in Sources */ = {isa = PBXBuildFile; fileRef = 88660B771AF6CBA3002B795F /* ScreenUtil.m */; };
 		88FA44AD1AF40CDB00DCC44B /* libAIBSQLite.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 88FA44AC1AF40CD500DCC44B /* libAIBSQLite.a */; };
 		88FA44AF1AF40DE500DCC44B /* libsqlite3.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 88FA44AE1AF40DE500DCC44B /* libsqlite3.dylib */; };
 		88FA44B51AF44B3200DCC44B /* FileUtil.m in Sources */ = {isa = PBXBuildFile; fileRef = 88FA44B41AF44B3200DCC44B /* FileUtil.m */; };
@@ -117,6 +118,8 @@
 		13B07FB71A68108700A75B9A /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = iOS/main.m; sourceTree = "<group>"; };
 		146833FF1AC3E56700842450 /* React.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = React.xcodeproj; path = "node_modules/react-native/React/React.xcodeproj"; sourceTree = "<group>"; };
 		832341B01AAA6A8300B99B32 /* RCTText.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RCTText.xcodeproj; path = "node_modules/react-native/Libraries/Text/RCTText.xcodeproj"; sourceTree = "<group>"; };
+		88660B761AF6CBA3002B795F /* ScreenUtil.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ScreenUtil.h; path = iOS/ScreenUtil.h; sourceTree = "<group>"; };
+		88660B771AF6CBA3002B795F /* ScreenUtil.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ScreenUtil.m; path = iOS/ScreenUtil.m; sourceTree = "<group>"; };
 		88FA447F1AF408A900DCC44B /* libedit.3.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libedit.3.dylib; path = usr/lib/libedit.3.dylib; sourceTree = SDKROOT; };
 		88FA44A71AF40CD500DCC44B /* AIBSQLite.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = AIBSQLite.xcodeproj; path = "node_modules/react-native-sqlite/AIBSQLite.xcodeproj"; sourceTree = "<group>"; };
 		88FA44AE1AF40DE500DCC44B /* libsqlite3.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libsqlite3.dylib; path = usr/lib/libsqlite3.dylib; sourceTree = SDKROOT; };
@@ -253,6 +256,8 @@
 			isa = PBXGroup;
 			children = (
 				88FA44B31AF44B3200DCC44B /* FileUtil.h */,
+				88660B761AF6CBA3002B795F /* ScreenUtil.h */,
+				88660B771AF6CBA3002B795F /* ScreenUtil.m */,
 				88FA44B41AF44B3200DCC44B /* FileUtil.m */,
 				88FA44AE1AF40DE500DCC44B /* libsqlite3.dylib */,
 				88FA447F1AF408A900DCC44B /* libedit.3.dylib */,
@@ -459,6 +464,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				88FA44B51AF44B3200DCC44B /* FileUtil.m in Sources */,
+				88660B781AF6CBA3002B795F /* ScreenUtil.m in Sources */,
 				13B07FBC1A68108700A75B9A /* AppDelegate.m in Sources */,
 				13B07FC11A68108700A75B9A /* main.m in Sources */,
 			);

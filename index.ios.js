@@ -2,7 +2,7 @@
 
 var React = require('react-native');
 var {TouchableOpacity, ListView, Navigator, AppRegistry, StyleSheet, Text, View} = React;
-var {FileUtil} = require('NativeModules');
+var {ScreenUtil, FileUtil} = require('NativeModules');
 
 function onError(err) {
 	console.error(err);
@@ -11,6 +11,8 @@ function onError(err) {
 function setResponder() {
 	return true;
 }
+console.log(ScreenUtil.width);
+console.log(ScreenUtil.height);
 
 function arrToDS(arr) {
 	var ds = new ListView.DataSource({
