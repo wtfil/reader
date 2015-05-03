@@ -1,7 +1,7 @@
 'use strict';
 
 var React = require('react-native');
-var {TouchableHighlight, Navigator, AppRegistry, StyleSheet, Text, View} = React;
+var {TouchableOpacity, ListView, Navigator, AppRegistry, StyleSheet, Text, View} = React;
 var {FileUtil} = require('NativeModules');
 
 function onError(err) {
@@ -12,13 +12,24 @@ function setResponder() {
 	return true;
 }
 
+function arrToDS(arr) {
+	var ds = new ListView.DataSource({
+		rowHasChanged: (r1, r2) => r1 !== r2
+	});
+	return ds.cloneWithRows(arr);
+}
+
 class Library extends React.Component {
 	constructor() {
-		this.state = {books: []};
+		this.state = {
+			books: arrToDS([])
+		};
 	}
 	componentWillMount() {
 		FileUtil.readDir('books', onError, data => {
-			this.setState({books: data});
+			this.setState({
+				books: arrToDS(data)
+			});
 		});
 	}
 	onBookTouch(bookName) {
@@ -28,31 +39,46 @@ class Library extends React.Component {
 		});
 	}
 	render() {
-		return <View style={styles.container}>
-			{this.state.books.map((bookName, index) =>
-				<TouchableHighlight onPress={this.onBookTouch.bind(this, bookName)}>
-					<Text>{bookName}</Text>
-				</TouchableHighlight>
-			)}
-		</View>;
+		return <ListView style={styles.library}
+			dataSource={this.state.books}
+			renderRow={bookName =>
+				<TouchableOpacity onPress={this.onBookTouch.bind(this, bookName)}>
+					<View style={styles.libraryRow}>
+						<Text>{bookName}</Text>
+					</View>
+				</TouchableOpacity>
+			}
+		/>;
 	}
 }
 
 class BookReader extends React.Component {
 	constructor() {
-		this.state = {book: null};
+		this.state = {
+			book: null,
+			offset: 0
+		};
 	}
 	componentWillMount() {
 		FileUtil.readFile('books/' + this.props.bookName, onError, data => {
 			this.setState({book: data});
 		});
 	}
+	onPress() {
+		this.setState({
+			offset: this.state.offset + 100
+		});
+	}
 	render() {
-		return <View style={styles.container}>
-			<Text>{this.state.book ?
-				this.state.book.slice(0, 10000) :
-				'Loading...'
-			}</Text>
+		return <View style={styles.bookReader}>
+			{this.state.book ?
+				<TouchableOpacity onPress={this.onPress.bind(this)}>
+					<Text>
+						{this.state.book.slice(this.state.offset, this.state.offset + 1000)}
+					</Text>
+				</TouchableOpacity> :
+				<Text>Loading...</Text>
+			}
 		</View>;
   	}
 }
@@ -75,12 +101,23 @@ class App extends React.Component {
 }
 
 var styles = StyleSheet.create({
-  	container: {
-    	flex: 1,
-    	justifyContent: 'center',
-    	alignItems: 'center',
-    	backgroundColor: '#F5FCFF',
-  	},
+	bookReader: {
+		padding: 30
+	},
+	libraryHeader: {
+		fontSize: 18,
+		marginBottom: 10
+	},
+	libraryRow: {
+		paddingLeft: 20
+	},
+	library: {
+		paddingTop: 50,
+	},
+	container: {
+		flex: 1,
+		backgroundColor: '#F5FCFF'
+	},
 });
 
 AppRegistry.registerComponent('AwesomeProject', () => App);
