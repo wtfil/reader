@@ -15,7 +15,7 @@ function getPageSize({height, width, text, offset}) {
 			w = 0;
 			l = 0;
 		} else if (text[i] === ' ') {
-			tw = l * lw;
+			tw = (l + 1) * lw;
 			if (tw + w > width) {
 				l = 0;
 				w = tw;
@@ -48,37 +48,61 @@ class BookReader extends React.Component {
 		var pageSize = getPageSize({
 			text: this.state.book,
 			offset: this.state.offset,
-			width: ScreenUtil.width - 60, //TODO 2*padding
-			height: ScreenUtil.height - 60
+			width: ScreenUtil.width - 10, //TODO 2*padding
+			height: ScreenUtil.height - 30
 		});
 		this.setState({
 			offset: this.state.offset + pageSize
 		});
 	}
 	render() {
-		return <View ref="view" style={styles.main}>
-			{this.state.book ?
-				<TouchableOpacity onPress={this.onPress.bind(this)}>
-					<Text style={styles.text}>
-						{this.state.book.slice(this.state.offset, this.state.offset + 1000)}
-					</Text>
-				</TouchableOpacity> :
+		if (!this.state.book) {
+			return <View>
 				<Text>Loading...</Text>
-			}
+			</View>;
+		}
+
+		// TODO padding
+		var progress = (this.state.offset / this.state.book.length) * (ScreenUtil.width - 14)
+
+		return <View ref="view" style={styles.main}>
+			<TouchableOpacity onPress={this.onPress.bind(this)}>
+				<Text style={styles.text}>
+					{this.state.book.slice(this.state.offset, this.state.offset + 1000)}
+				</Text>
+			</TouchableOpacity>
+			<View style={styles.progress}>
+				<View style={[styles.progressIndecator, {left: progress}]} />
+			</View>
 		</View>;
   	}
 }
 
 var styles = StyleSheet.create({
 	main: {
-		padding: 30
+		top: 0,
+		bottom: 0,
+		flex: 1,
 	},
 	text: {
+		fontFamily: 'Helvetica Neue',
+		bottom: 10,
+		top: 0,
+		position: 'absolute',
 		lineHeight: 15,
 		fontSize: 15
 	},
-	hiddenText: {
-		position: 'absolute'
+	progress: {
+		height: 3,
+		position: 'absolute',
+		left: 0,
+		right: 0,
+		bottom: 0,
+		borderWidth: 1
+	},
+	progressIndecator: {
+		borderWidth: 1,
+		width: 3
 	}
 });
 

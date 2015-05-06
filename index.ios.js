@@ -47,6 +47,9 @@ class Library extends React.Component {
 	render() {
 		return <ListView style={styles.library}
 			dataSource={this.state.books}
+			renderSectionHeader={() => {
+				return <Text style={styles.libraryHeader}>Your library</Text>
+			}}
 			renderRow={bookName =>
 				<TouchableOpacity onPress={this.onBookTouch.bind(this, bookName)}>
 					<View style={styles.libraryRow}>
@@ -81,12 +84,14 @@ var styles = StyleSheet.create({
 		marginBottom: 10
 	},
 	libraryRow: {
-		paddingLeft: 20
 	},
 	library: {
-		paddingTop: 50,
 	},
 	container: {
+		paddingTop: 30,
+		paddingLeft: 7,
+		paddingRight: 7,
+		paddingBottom: 7,
 		flex: 1,
 		backgroundColor: '#F5FCFF'
 	},
