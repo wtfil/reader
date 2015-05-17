@@ -7,14 +7,14 @@
 	<key>IDESourceControlProjectIdentifier</key>
 	<string>01B9C8B3-5280-4601-B24B-7E6ADE800FF1</string>
 	<key>IDESourceControlProjectName</key>
-	<string>project</string>
+	<string>AwesomeProject</string>
 	<key>IDESourceControlProjectOriginsDictionary</key>
 	<dict>
 		<key>915DD91B7AD8BD4F36EB7E8B98DCD19E45A96DA0</key>
 		<string>github.com:wtfil/reader.git</string>
 	</dict>
 	<key>IDESourceControlProjectPath</key>
-	<string>AwesomeProject.xcodeproj/project.xcworkspace</string>
+	<string>AwesomeProject.xcodeproj</string>
 	<key>IDESourceControlProjectRelativeInstallPathDictionary</key>
 	<dict>
 		<key>915DD91B7AD8BD4F36EB7E8B98DCD19E45A96DA0</key>

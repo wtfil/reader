@@ -52,6 +52,24 @@ RCT_EXPORT_METHOD(readFile: (NSString *)fileName
     }
 }
 
+RCT_EXPORT_METHOD(writeFile: (NSString *)fileName
+                  withContents:(NSString *)contents
+                  callback: (RCTResponseSenderBlock)callback) {
+    
+    NSString *documentsDirectory = getDocumentsRoot();
+    
+    fileName = [NSString stringWithFormat:@"%@/%@", documentsDirectory, fileName];
+    NSError *error;
+    
+    [contents writeToFile: fileName
+               atomically: NO
+               //encoding: NSStringEncodingConversionAllowLossy
+               encoding: NSUTF8StringEncoding
+               error: &error];
+    
+    callback(error ? @[[error localizedDescription]] : @[[NSNull null]]);
+}
+
 RCT_EXPORT_METHOD(createDir: (NSString *)dirName
                   callback: (RCTResponseSenderBlock)callback) {
 

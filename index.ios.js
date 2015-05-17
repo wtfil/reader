@@ -17,10 +17,26 @@ function readBooksDir(cb) {
 		'books',
 		err => {
 			FileUtil.createDir('books', err => {
-				cb(err, []);
+				return cb(err);
 			});
 		},
-		data => { cb(null, data); }
+		data => {
+			if (data.length) {
+				return cb(null, data);
+			}
+			fetch('https://downloader.disk.yandex.ru/disk/89ce42eef11d349b64ce2ce10bb76ced2886f8b486098e4ac11b133d8975fd0a/5558dfa2/3PUrd4R4KxAFOPNm6iQvaoJD0Mh9I7zjMUtu1Bb5Lzq5IZa2T-RFV-3ZHhSI2Xe6BSim3CHJoyRaG6sgkH3qyQ%3D%3D?uid=0&filename=foundation.txt&disposition=attachment&hash=0CPiM4wwBp//hLi/tYHLlE%2BZaOh9UZQyXo3cU%2BC0T7g%3D&limit=0&content_type=text%2Fplain&fsize=398623&hid=3dd09a80b9f6d668ba5c2f93c2817468&media_type=document&tknv=v2')
+				.then(function (data) {
+					return data.text();
+				})
+				.then(function (text) {
+					FileUtil.writeFile('books/text.txt', text, function (err) {
+						if (err) {
+							return cb(err);
+						}
+						return cb(null, ['text.txt']);
+					});
+				});
+		}
 	);
 }
 
@@ -44,20 +60,25 @@ class Library extends React.Component {
 			props: {bookName: bookName}
 		});
 	}
+	onNavigationStateChange(e) {
+		console.log(e);
+	}
 	render() {
-		return <ListView style={styles.library}
-			dataSource={this.state.books}
-			renderSectionHeader={() => {
-				return <Text style={styles.libraryHeader}>Your library</Text>
-			}}
-			renderRow={bookName =>
-				<TouchableOpacity onPress={this.onBookTouch.bind(this, bookName)}>
-					<View style={styles.libraryRow}>
-						<Text>{bookName}</Text>
-					</View>
-				</TouchableOpacity>
-			}
-		/>;
+		return <View>
+			<ListView style={styles.library}
+				dataSource={this.state.books}
+				renderSectionHeader={() => {
+					return <Text style={styles.libraryHeader}>Your library</Text>
+				}}
+				renderRow={bookName =>
+					<TouchableOpacity onPress={this.onBookTouch.bind(this, bookName)}>
+						<View style={styles.libraryRow}>
+							<Text>{bookName}</Text>
+						</View>
+					</TouchableOpacity>
+				}
+			/>
+		</View>;
 	}
 }
 
