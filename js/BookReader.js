@@ -32,6 +32,28 @@ function getPageSize({height, width, text, offset}) {
 	return i - offset;
 }
 
+class GuestureView extends React.Component {
+	onTouchUp(e) {
+		var touch = e.touchHistory.touchBank[1];
+		var diff = touch.currentPageX - touch.startPageX;
+		if (Math.abs(diff) < 5) {
+			this.props.onPress && this.props.onPress();
+		} else if (diff > 0) {
+			this.props.onSwipeRight && this.props.onSwipeRight();
+		} else if (diff < 0) {
+			this.props.onSwipeLeft && this.props.onSwipeLeft();
+		}
+	}
+	render() {
+		return <View
+			style={{flex: 1}}
+			onStartShouldSetResponder={() => true}
+			onResponderRelease={this.onTouchUp.bind(this)}
+			children={this.props.children}
+		/>;
+	}
+}
+
 class BookReader extends React.Component {
 	constructor() {
 		this.state = {
@@ -44,7 +66,7 @@ class BookReader extends React.Component {
 			this.setState({book: data});
 		});
 	}
-	onPress() {
+	nextPage() {
 		var pageSize = getPageSize({
 			text: this.state.book,
 			offset: this.state.offset,
@@ -66,11 +88,11 @@ class BookReader extends React.Component {
 		var progress = (this.state.offset / this.state.book.length) * (ScreenUtil.width - 14)
 
 		return <View ref="view" style={styles.main}>
-			<TouchableOpacity onPress={this.onPress.bind(this)}>
+			<GuestureView onSwipeRight={this.nextPage.bind(this)}>
 				<Text style={styles.text}>
 					{this.state.book.slice(this.state.offset, this.state.offset + 1000)}
 				</Text>
-			</TouchableOpacity>
+			</GuestureView>
 			<View style={styles.progress}>
 				<View style={[styles.progressIndecator, {left: progress}]} />
 			</View>

@@ -54,7 +54,7 @@ class Library extends React.Component {
 			this.setState({books: arrToDS(books)});
 		});
 	}
-	onBookTouch(bookName) {
+	onBookSelect(bookName) {
 		this.props.navigation.replace({
 			component: BookReader,
 			props: {bookName: bookName}
@@ -71,7 +71,7 @@ class Library extends React.Component {
 					return <Text style={styles.libraryHeader}>Your library</Text>
 				}}
 				renderRow={bookName =>
-					<TouchableOpacity onPress={this.onBookTouch.bind(this, bookName)}>
+					<TouchableOpacity onPress={this.onBookSelect.bind(this, bookName)}>
 						<View style={styles.libraryRow}>
 							<Text>{bookName}</Text>
 						</View>
