@@ -1,6 +1,7 @@
 var React = require('react-native');
 var {ScreenUtil, FileUtil} = require('NativeModules');
 var {TouchableOpacity, StyleSheet, Text, View} = React;
+this.React = React;
 
 function onError(err) {
 	console.error(err);
@@ -32,28 +33,6 @@ function getPageSize({height, width, text, offset}) {
 	return i - offset;
 }
 
-class GuestureView extends React.Component {
-	onTouchUp(e) {
-		var touch = e.touchHistory.touchBank[1];
-		var diff = touch.currentPageX - touch.startPageX;
-		if (Math.abs(diff) < 5) {
-			this.props.onPress && this.props.onPress();
-		} else if (diff > 0) {
-			this.props.onSwipeRight && this.props.onSwipeRight();
-		} else if (diff < 0) {
-			this.props.onSwipeLeft && this.props.onSwipeLeft();
-		}
-	}
-	render() {
-		return <View
-			style={{flex: 1}}
-			onStartShouldSetResponder={() => true}
-			onResponderRelease={this.onTouchUp.bind(this)}
-			children={this.props.children}
-		/>;
-	}
-}
-
 class BookReader extends React.Component {
 	constructor() {
 		this.state = {
@@ -77,6 +56,26 @@ class BookReader extends React.Component {
 			offset: this.state.offset + pageSize
 		});
 	}
+	prevPage() {
+	}
+	onWordPress() {
+		var word = this.children;
+		if (!/\w+/.test(word)) {
+			return;
+		}
+		console.log(this.children);
+	}
+	onWordTouchUp(e) {
+		var touch = e.touchHistory.touchBank[1];
+		var diff = touch.currentPageX - touch.startPageX;
+		if (Math.abs(diff) < 5) {
+			return;
+		} else if (diff > 0) {
+			this.prevPage();
+		} else if (diff < 0) {
+			this.nextPage();
+		}
+	}
 	render() {
 		if (!this.state.book) {
 			return <View>
@@ -87,12 +86,16 @@ class BookReader extends React.Component {
 		// TODO padding
 		var progress = (this.state.offset / this.state.book.length) * (ScreenUtil.width - 14)
 
+		var words = this.state.book
+			.slice(this.state.offset, this.state.offset + 1000)
+			.split(/([^\w])/);
+
 		return <View ref="view" style={styles.main}>
-			<GuestureView onSwipeRight={this.nextPage.bind(this)}>
-				<Text style={styles.text}>
-					{this.state.book.slice(this.state.offset, this.state.offset + 1000)}
-				</Text>
-			</GuestureView>
+			<Text style={styles.text}>
+				{words.map(word =>
+					<Text onResponderRelease={this.onWordTouchUp.bind(this)} onPress={this.onWordPress}>{word}</Text>
+				)}
+			</Text>
 			<View style={styles.progress}>
 				<View style={[styles.progressIndecator, {left: progress}]} />
 			</View>
@@ -108,7 +111,7 @@ var styles = StyleSheet.create({
 	},
 	text: {
 		fontFamily: 'Helvetica Neue',
-		bottom: 10,
+		bottom: 9,
 		top: 0,
 		position: 'absolute',
 		lineHeight: 15,
