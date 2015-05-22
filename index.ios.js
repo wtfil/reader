@@ -4,6 +4,7 @@ var React = require('react-native');
 var {TouchableOpacity, ListView, Navigator, AppRegistry, StyleSheet, Text, View} = React;
 var {FileUtil} = require('NativeModules');
 var BookReader = require('./js/BookReader');
+var progress = require('./js/progress');
 
 function arrToDS(arr) {
 	var ds = new ListView.DataSource({
@@ -55,6 +56,7 @@ class Library extends React.Component {
 		});
 	}
 	onBookSelect(bookName) {
+		progress.set('currentBook', bookName);
 		this.props.navigation.replace({
 			component: BookReader,
 			props: {bookName: bookName}
@@ -83,6 +85,15 @@ class Library extends React.Component {
 }
 
 class App extends React.Component {
+	constructor() {
+		this.state = {};
+		progress.get((err, progress) => {
+			this.setState({
+				progress: progress,
+				loaded: true
+			});
+		});
+	}
 	renderScene(route, navigation) {
 		var Component = route.component;
 		return <View style={styles.container}>
@@ -90,11 +101,25 @@ class App extends React.Component {
 		</View>;
 	}
 	render() {
+		if (!this.state.loaded) {
+			return <View></View>;
+		}
+		var progress = this.state.progress;
+		var initialRoute = progress.currentBook ?
+			{
+				component: BookReader,
+				props: {
+					bookName: progress.currentBook,
+					offset: progress.books &&
+						progress.books[progress.currentBook] &&
+						progress.books[progress.currentBook].offset || 0
+				}
+			} : {
+				component: Library
+			};
 		return <Navigator
 			renderScene={this.renderScene}
-			initialRoute={{
-				component: Library
-			}}
+			initialRoute={initialRoute}
 		/>;
 	}
 }

@@ -1,7 +1,7 @@
 var React = require('react-native');
 var {ScreenUtil, FileUtil} = require('NativeModules');
 var {TouchableOpacity, StyleSheet, Text, View} = React;
-this.React = React;
+var progress = require('./progress');
 
 function onError(err) {
 	console.error(err);
@@ -42,7 +42,10 @@ class BookReader extends React.Component {
 	}
 	componentWillMount() {
 		FileUtil.readFile('books/' + this.props.bookName, onError, data => {
-			this.setState({book: data});
+			this.setState({
+				book: data,
+				offset: this.props.offset || 0
+			});
 		});
 	}
 	nextPage() {
@@ -52,9 +55,11 @@ class BookReader extends React.Component {
 			width: ScreenUtil.width - 10, //TODO 2*padding
 			height: ScreenUtil.height - 30
 		});
+		var offset = this.state.offset + pageSize;
 		this.setState({
-			offset: this.state.offset + pageSize
+			offset: offset
 		});
+		progress.setForCurrent('offset', offset);
 	}
 	prevPage() {
 	}
