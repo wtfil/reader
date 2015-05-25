@@ -7,7 +7,7 @@ function onError(err) {
 	console.error(err);
 }
 
-function getPageSize({height, width, text, offset}) {
+function getNewOffset({height, width, text, offset, sign}) {
 	var lh = 17, lw = 7;
 	var l = 0, tw = 0, w = 0, h = 0, i = offset;
 	while (h < height) {
@@ -28,9 +28,9 @@ function getPageSize({height, width, text, offset}) {
 		} else {
 			l ++;
 		}
-		i ++;
+		i += sign;
 	}
-	return i - offset;
+	return i + (sign < 0 ? 2 : 0);
 }
 
 class BookReader extends React.Component {
@@ -48,20 +48,24 @@ class BookReader extends React.Component {
 			});
 		});
 	}
-	nextPage() {
-		var pageSize = getPageSize({
+	updateOffset(sign) {
+		var offset = getNewOffset({
 			text: this.state.book,
+			sign: sign,
 			offset: this.state.offset,
 			width: ScreenUtil.width - 10, //TODO 2*padding
 			height: ScreenUtil.height - 30
 		});
-		var offset = this.state.offset + pageSize;
 		this.setState({
 			offset: offset
 		});
 		progress.setForCurrent('offset', offset);
 	}
+	nextPage() {
+		this.updateOffset(+1);
+	}
 	prevPage() {
+		this.updateOffset(-1);
 	}
 	onWordPress() {
 		var word = this.children;

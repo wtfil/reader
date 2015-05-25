@@ -1,4 +1,5 @@
 var {AsyncStorage} = require('react-native');
+var slice = [].slice;
 
 function get(cb) {
 	AsyncStorage.getItem('progress', (e, progress) => {
