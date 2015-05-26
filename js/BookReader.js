@@ -2,6 +2,7 @@ var React = require('react-native');
 var {ScreenUtil, FileUtil} = require('NativeModules');
 var {TouchableOpacity, StyleSheet, Text, View} = React;
 var progress = require('./progress');
+var translate = require('./translate');
 
 function onError(err) {
 	console.error(err);
@@ -33,10 +34,15 @@ function getNewOffset({height, width, text, offset, sign}) {
 	return i + (sign < 0 ? 2 : 0);
 }
 
+function getWords(text) {
+	return text.split(/([^\w])/);
+}
+
 class BookReader extends React.Component {
 	constructor() {
 		this.state = {
 			book: null,
+			quick: true,
 			offset: 0
 		};
 	}
@@ -44,9 +50,13 @@ class BookReader extends React.Component {
 		FileUtil.readFile('books/' + this.props.bookName, onError, data => {
 			this.setState({
 				book: data,
+				timer: this.getSlowUpdateTimer(),
 				offset: this.props.offset || 0
 			});
 		});
+	}
+	getSlowUpdateTimer() {
+		return setTimeout(this.setState.bind(this, {quick: false, timer: null}), 0);
 	}
 	updateOffset(sign) {
 		var offset = getNewOffset({
@@ -56,9 +66,13 @@ class BookReader extends React.Component {
 			width: ScreenUtil.width - 10, //TODO 2*padding
 			height: ScreenUtil.height - 30
 		});
-		console.log(offset - this.state.offset);
+		if (this.state.timer) {
+			clearTimeout(this.state.timer);
+		}
 		this.setState({
-			offset: offset
+			timer: this.getSlowUpdateTimer(),
+			offset: offset,
+			quick: true
 		});
 		progress.setForCurrent('offset', offset);
 	}
@@ -68,26 +82,24 @@ class BookReader extends React.Component {
 	prevPage() {
 		this.updateOffset(-1);
 	}
-	onWordPress({x, y}) {
-		console.log(x, y);
-		return;
-		var word = this.children;
-		if (!/\w+/.test(word)) {
+	onWordPress(word) {
+		if (!/^\w+$/.test(word)) {
 			return;
 		}
+		translate({text: word}).then(function (texts) {
+			console.log(texts);
+		}).catch(onError);
 	}
-	onWordTouchUp(e) {
+	onWordTouchUp(e, bookReader) {
+		console.log('touch');
 		var touch = e.touchHistory.touchBank[1];
 		var diff = touch.currentPageX - touch.startPageX;
 		if (Math.abs(diff) < 5) {
-			this.onWordPress({
-				x: e.nativeEvent.locationX,
-				y: e.nativeEvent.locationY
-			});
+			bookReader.onWordPress(this.props.children);
 		} else if (diff > 0) {
-			this.prevPage();
+			bookReader.prevPage();
 		} else if (diff < 0) {
-			this.nextPage();
+			bookReader.nextPage();
 		}
 	}
 	render() {
@@ -99,20 +111,31 @@ class BookReader extends React.Component {
 
 		// TODO padding
 		var progress = (this.state.offset / this.state.book.length) * (ScreenUtil.width - 14)
+		var text = this.state.book.slice(this.state.offset, this.state.offset + 1000);
+	   	var _this = this;
 
-		/*
-		var words = this.state.book
-			.slice(this.state.offset, this.state.offset + 1000)
-			.split(/([^\w])/);
+		function onWordTouchUp(e) {
+			_this.onWordTouchUp.call(this, e, _this);
+		}
 
-		{words.map(word =>
-		   <Text onResponderRelease={this.onWordTouchUp.bind(this)} onPress={this.onWordPress}>{word}</Text>
-		)}
-		*/
 		return <View ref="view" style={styles.main}>
-			<Text style={styles.text} onStartShouldSetResponder={() => true} onResponderRelease={this.onWordTouchUp.bind(this)}>
-				{this.state.book.slice(this.state.offset, this.state.offset + 1000)}
-			</Text>
+			{this.state.quick ?
+				<Text
+					onResponderRelease={onWordTouchUp}
+					onStartShouldSetResponder={() => true}
+					children={text}
+				/> :
+				<Text>
+					{getWords(text).map((word, index) =>
+						<Text
+							key={index}
+							onResponderRelease={onWordTouchUp}
+							onStartShouldSetResponder={() => true}
+							children={word}
+						/>
+					)}
+				</Text>
+			}
 			<View style={styles.progress}>
 				<View style={[styles.progressIndecator, {left: progress}]} />
 				<Text style={styles.position}>{Math.round(this.state.offset / this.state.book.length * 100)}%</Text>
