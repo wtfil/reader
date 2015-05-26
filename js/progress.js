@@ -17,6 +17,9 @@ function set(key, val) {
 		if (e) {
 			return;
 		}
+		if (!progress) {
+			progress = {};
+		}
 		progress[key] = val;
 		AsyncStorage.setItem('progress', JSON.stringify(progress));
 	});

@@ -105,7 +105,7 @@ class App extends React.Component {
 			return <View></View>;
 		}
 		var progress = this.state.progress;
-		var initialRoute = progress.currentBook ?
+		var initialRoute = progress && progress.currentBook ?
 			{
 				component: BookReader,
 				props: {

@@ -56,6 +56,7 @@ class BookReader extends React.Component {
 			width: ScreenUtil.width - 10, //TODO 2*padding
 			height: ScreenUtil.height - 30
 		});
+		console.log(offset - this.state.offset);
 		this.setState({
 			offset: offset
 		});
@@ -67,18 +68,22 @@ class BookReader extends React.Component {
 	prevPage() {
 		this.updateOffset(-1);
 	}
-	onWordPress() {
+	onWordPress({x, y}) {
+		console.log(x, y);
+		return;
 		var word = this.children;
 		if (!/\w+/.test(word)) {
 			return;
 		}
-		console.log(this.children);
 	}
 	onWordTouchUp(e) {
 		var touch = e.touchHistory.touchBank[1];
 		var diff = touch.currentPageX - touch.startPageX;
 		if (Math.abs(diff) < 5) {
-			return;
+			this.onWordPress({
+				x: e.nativeEvent.locationX,
+				y: e.nativeEvent.locationY
+			});
 		} else if (diff > 0) {
 			this.prevPage();
 		} else if (diff < 0) {
@@ -95,18 +100,22 @@ class BookReader extends React.Component {
 		// TODO padding
 		var progress = (this.state.offset / this.state.book.length) * (ScreenUtil.width - 14)
 
+		/*
 		var words = this.state.book
 			.slice(this.state.offset, this.state.offset + 1000)
 			.split(/([^\w])/);
 
+		{words.map(word =>
+		   <Text onResponderRelease={this.onWordTouchUp.bind(this)} onPress={this.onWordPress}>{word}</Text>
+		)}
+		*/
 		return <View ref="view" style={styles.main}>
-			<Text style={styles.text}>
-				{words.map(word =>
-					<Text onResponderRelease={this.onWordTouchUp.bind(this)} onPress={this.onWordPress}>{word}</Text>
-				)}
+			<Text style={styles.text} onStartShouldSetResponder={() => true} onResponderRelease={this.onWordTouchUp.bind(this)}>
+				{this.state.book.slice(this.state.offset, this.state.offset + 1000)}
 			</Text>
 			<View style={styles.progress}>
 				<View style={[styles.progressIndecator, {left: progress}]} />
+				<Text style={styles.position}>{Math.round(this.state.offset / this.state.book.length * 100)}%</Text>
 			</View>
 		</View>;
   	}
@@ -118,9 +127,13 @@ var styles = StyleSheet.create({
 		bottom: 0,
 		flex: 1,
 	},
+	position: {
+		fontSize: 6,
+		textAlign: 'center'
+	},
 	text: {
 		fontFamily: 'Helvetica Neue',
-		bottom: 9,
+		bottom: 6,
 		top: 0,
 		position: 'absolute',
 		lineHeight: 15,

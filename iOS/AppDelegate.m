@@ -28,6 +28,7 @@
   // iOS device are on the same Wi-Fi network.
   // jsCodeLocation = [NSURL URLWithString:@"http://wtfil-dev.ngrok.com/index.ios.bundle"];
   jsCodeLocation = [NSURL URLWithString:@"http://localhost:8081/index.ios.bundle"];
+  // jsCodeLocation = [NSURL URLWithString:@"http://192.168.1.103:8081/index.ios.bundle"];
 
   // OPTION 2
   // Load from pre-bundled file on disk. To re-generate the static bundle, run
