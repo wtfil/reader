@@ -1,2 +1,0 @@
-# reader
-react native app
