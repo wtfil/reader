@@ -1,6 +1,6 @@
 var React = require('react-native');
 var {ScreenUtil, FileUtil} = require('NativeModules');
-var {TouchableOpacity, StyleSheet, Text, View} = React;
+var {LayoutAnimation, TouchableOpacity, StyleSheet, Text, View} = React;
 var progress = require('./progress');
 var translate = require('./translate');
 
@@ -72,6 +72,7 @@ class BookReader extends React.Component {
 		this.setState({
 			timer: this.getSlowUpdateTimer(),
 			offset: offset,
+			translated: null,
 			quick: true
 		});
 		progress.setForCurrent('offset', offset);
@@ -86,12 +87,15 @@ class BookReader extends React.Component {
 		if (!/^\w+$/.test(word)) {
 			return;
 		}
-		translate({text: word}).then(function (texts) {
-			console.log(texts);
-		}).catch(onError);
+		LayoutAnimation.configureNext(easeInEaseOut);
+		this.setState({
+			translated: translate({text: word})
+		});
+	}
+	closeTranslated() {
+		this.setState({translated: null})
 	}
 	onWordTouchUp(e, bookReader) {
-		console.log('touch');
 		var touch = e.touchHistory.touchBank[1];
 		var diff = touch.currentPageX - touch.startPageX;
 		if (Math.abs(diff) < 5) {
@@ -140,6 +144,15 @@ class BookReader extends React.Component {
 				<View style={[styles.progressIndecator, {left: progress}]} />
 				<Text style={styles.position}>{Math.round(this.state.offset / this.state.book.length * 100)}%</Text>
 			</View>
+			{this.state.translated &&
+				<View
+					style={styles.translated}
+					onStartShouldSetResponder={() => true}
+					onResponderRelease={this.closeTranslated.bind(this)}
+					>
+					<Text>{this.state.translated}</Text>
+				</View>
+			}
 		</View>;
   	}
 }
@@ -153,6 +166,15 @@ var styles = StyleSheet.create({
 	position: {
 		fontSize: 6,
 		textAlign: 'center'
+	},
+	translated: {
+		flex: 1,
+		position: 'absolute',
+		bottom: 0,
+		padding: 10,
+		width: 1000,
+		left: -10,
+		backgroundColor: '#98A187'
 	},
 	text: {
 		fontFamily: 'Helvetica Neue',
@@ -175,5 +197,17 @@ var styles = StyleSheet.create({
 		width: 3
 	}
 });
+
+var easeInEaseOut = {
+	duration: 100,
+	create: {
+	    type: LayoutAnimation.Types.easeInEaseOut,
+	    property: LayoutAnimation.Properties.scaleXY,
+	},
+	update: {
+	    delay: 0,
+	    type: LayoutAnimation.Types.easeInEaseOut,
+	}
+};
 
 module.exports = BookReader;

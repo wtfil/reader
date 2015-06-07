@@ -1,7 +1,7 @@
 'use strict';
 
 var React = require('react-native');
-var {TouchableOpacity, ListView, Navigator, AppRegistry, StyleSheet, Text, View} = React;
+var {LinkingIOS, TouchableOpacity, ListView, Navigator, AppRegistry, StyleSheet, Text, View} = React;
 var {FileUtil} = require('NativeModules');
 var BookReader = require('./js/BookReader');
 var progress = require('./js/progress');
