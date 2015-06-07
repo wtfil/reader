@@ -25,7 +25,7 @@ function readBooksDir(cb) {
 			if (data.length) {
 				return cb(null, data);
 			}
-			fetch('https://downloader.disk.yandex.ru/disk/89ce42eef11d349b64ce2ce10bb76ced2886f8b486098e4ac11b133d8975fd0a/5558dfa2/3PUrd4R4KxAFOPNm6iQvaoJD0Mh9I7zjMUtu1Bb5Lzq5IZa2T-RFV-3ZHhSI2Xe6BSim3CHJoyRaG6sgkH3qyQ%3D%3D?uid=0&filename=foundation.txt&disposition=attachment&hash=0CPiM4wwBp//hLi/tYHLlE%2BZaOh9UZQyXo3cU%2BC0T7g%3D&limit=0&content_type=text%2Fplain&fsize=398623&hid=3dd09a80b9f6d668ba5c2f93c2817468&media_type=document&tknv=v2')
+			fetch('https://downloader.disk.yandex.ru/disk/7c078d4793daa1ac3b888947a385c6aaedd737951009eb229d8c2ef2976afa36/5574633b/3PUrd4R4KxAFOPNm6iQvaoJD0Mh9I7zjMUtu1Bb5Lzq5IZa2T-RFV-3ZHhSI2Xe6BSim3CHJoyRaG6sgkH3qyQ%3D%3D?uid=0&filename=foundation.txt&disposition=attachment&hash=0CPiM4wwBp//hLi/tYHLlE%2BZaOh9UZQyXo3cU%2BC0T7g%3D&limit=0&content_type=text%2Fplain&fsize=398623&hid=3dd09a80b9f6d668ba5c2f93c2817468&media_type=document&tknv=v2')
 				.then(function (data) {
 					return data.text();
 				})
