@@ -85,11 +85,18 @@ class BookReader extends React.Component {
 	}
 	onWordPress(word) {
 		if (!/^\w+$/.test(word)) {
-			return;
+			return this.closeTranslated();
+		}
+		var translated = translate({text: word});
+		if (!translated) {
+			return this.closeTranslated();
 		}
 		LayoutAnimation.configureNext(easeInEaseOut);
 		this.setState({
-			translated: translate({text: word})
+			translated: {
+				word: word,
+				translated: translated
+			}
 		});
 	}
 	closeTranslated() {
@@ -99,7 +106,11 @@ class BookReader extends React.Component {
 		var touch = e.touchHistory.touchBank[1];
 		var diff = touch.currentPageX - touch.startPageX;
 		if (Math.abs(diff) < 5) {
-			bookReader.onWordPress(this.props.children);
+			if (touch.currentTimeStamp - touch.startTimeStamp > 300) {
+				bookReader.onWordPress(this.props.children);
+			} else {
+				bookReader.closeTranslated();
+			}
 		} else if (diff > 0) {
 			bookReader.prevPage();
 		} else if (diff < 0) {
@@ -132,6 +143,7 @@ class BookReader extends React.Component {
 				<Text>
 					{getWords(text).map((word, index) =>
 						<Text
+							style={this.state.translated && this.state.translated.word === word && {backgroundColor: '#FAFAC3'}}
 							key={index}
 							onResponderRelease={onWordTouchUp}
 							onStartShouldSetResponder={() => true}
@@ -150,7 +162,9 @@ class BookReader extends React.Component {
 					onStartShouldSetResponder={() => true}
 					onResponderRelease={this.closeTranslated.bind(this)}
 					>
-					<Text>{this.state.translated}</Text>
+					<Text>
+						{this.state.translated.word} - {this.state.translated.translated}
+					</Text>
 				</View>
 			}
 		</View>;
@@ -174,7 +188,7 @@ var styles = StyleSheet.create({
 		padding: 10,
 		width: 1000,
 		left: -10,
-		backgroundColor: '#98A187'
+		backgroundColor: '#FAFAC3'
 	},
 	text: {
 		fontFamily: 'Helvetica Neue',
