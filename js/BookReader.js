@@ -1,8 +1,9 @@
 var React = require('react-native');
 var {ScreenUtil, FileUtil} = require('NativeModules');
-var {LayoutAnimation, TouchableOpacity, StyleSheet, Text, View} = React;
+var {LayoutAnimation, StyleSheet, Text, View} = React;
 var progress = require('./progress');
 var translate = require('./translate');
+var Menu = require('./Menu');
 
 function onError(err) {
 	console.error(err);
@@ -43,15 +44,25 @@ class BookReader extends React.Component {
 		this.state = {
 			book: null,
 			quick: true,
-			offset: 0
+			offset: 0,
+			timer: null,
+			showMenu: false
 		};
 	}
 	componentWillMount() {
 		FileUtil.readFile('books/' + this.props.bookName, onError, data => {
 			this.setState({
 				book: data,
-				timer: this.getSlowUpdateTimer(),
-				offset: this.props.offset || 0
+				timer: this.getSlowUpdateTimer()
+			});
+		});
+		progress.get((err, progress) => {
+			var current = progress.books && progress.books[this.props.bookName];
+			if (!current) {
+				return;
+			}
+			this.setState({
+				offset: current.offset || 0
 			});
 		});
 	}
@@ -88,28 +99,29 @@ class BookReader extends React.Component {
 			return this.closeTranslated();
 		}
 		var translated = translate({text: word});
-		if (!translated) {
-			return this.closeTranslated();
-		}
 		LayoutAnimation.configureNext(easeInEaseOut);
 		this.setState({
+			showMenu: false,
 			translated: {
 				word: word,
-				translated: translated
+				translated: translated || 'No translation'
 			}
 		});
 	}
 	closeTranslated() {
 		this.setState({translated: null})
 	}
+	showMenu() {
+		this.setState({showMenu: true});
+	}
 	onWordTouchUp(e, bookReader) {
 		var touch = e.touchHistory.touchBank[1];
 		var diff = touch.currentPageX - touch.startPageX;
 		if (Math.abs(diff) < 5) {
 			if (touch.currentTimeStamp - touch.startTimeStamp > 300) {
-				bookReader.onWordPress(this.props.children);
+				bookReader.showMenu();
 			} else {
-				bookReader.closeTranslated();
+				bookReader.onWordPress(this.props.children);
 			}
 		} else if (diff > 0) {
 			bookReader.prevPage();
@@ -136,11 +148,12 @@ class BookReader extends React.Component {
 		return <View ref="view" style={styles.main}>
 			{this.state.quick ?
 				<Text
+					style={styles.text}
 					onResponderRelease={onWordTouchUp}
 					onStartShouldSetResponder={() => true}
 					children={text}
 				/> :
-				<Text>
+				<Text style={styles.text}>
 					{getWords(text).map((word, index) =>
 						<Text
 							style={this.state.translated && this.state.translated.word === word && {backgroundColor: '#FAFAC3'}}
@@ -166,6 +179,9 @@ class BookReader extends React.Component {
 						{this.state.translated.word} - {this.state.translated.translated}
 					</Text>
 				</View>
+			}
+			{this.state.showMenu &&
+				<Menu {...this.props}/>
 			}
 		</View>;
   	}
