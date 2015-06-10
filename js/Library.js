@@ -53,15 +53,17 @@ class Library extends React.Component {
 			this.setState({books: arrToDS(books)});
 		});
 	}
-	onNavigationStateChange(e) {
-		console.log(e);
-	}
 	render() {
 		return <View>
 			<ListView
 				dataSource={this.state.books}
 				renderSectionHeader={() => {
-					return <Text style={styles.header}>Your library</Text>
+					return <View style={styles.header}>
+					 	 <Text >Your library</Text>
+						 <Link name="upload">
+						 	<Text style={styles.upload}>Add+</Text>
+						 </Link>
+					</View>
 				}}
 				renderRow={bookName =>
 					<Link name="reader" query={{bookName: bookName}}>
@@ -77,8 +79,13 @@ class Library extends React.Component {
 
 var styles = StyleSheet.create({
 	header: {
+		flexDirection: 'row',
 		fontSize: 18,
 		marginBottom: 10
+	},
+	upload: {
+		marginLeft: 10,
+		color: 'green'
 	}
 });
 

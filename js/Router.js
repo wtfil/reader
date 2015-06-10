@@ -40,13 +40,14 @@ class Router extends React.Component {
 
 class Link extends React.Component {
 	render() {
-		return <TouchableOpacity
-			style={this.props.style}
-			children={this.props.children}
-			onPress={() => {
-				navigate(this.props.name, this.props.query)
-			}}
-		/>;
+		return <View style={this.props.style}>
+			<TouchableOpacity
+				children={this.props.children}
+				onPress={() => {
+					navigate(this.props.name, this.props.query)
+				}}
+			/>
+		</View>;
 	}
 }
 
