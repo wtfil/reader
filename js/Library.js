@@ -1,8 +1,8 @@
 var React = require('react-native');
 var {FileUtil} = require('NativeModules');
-var {TouchableOpacity, ListView, StyleSheet, Text, View} = React;
+var {ListView, StyleSheet, Text, View} = React;
 var progress = require('./progress');
-var {navigate} = require('./Router');
+var {Link} = require('./Router');
 
 function arrToDS(arr) {
 	var ds = new ListView.DataSource({
@@ -53,12 +53,6 @@ class Library extends React.Component {
 			this.setState({books: arrToDS(books)});
 		});
 	}
-	onBookSelect(bookName) {
-		progress.set('currentBook', bookName);
-		navigate('reader', {
-			bookName: bookName
-		});
-	}
 	onNavigationStateChange(e) {
 		console.log(e);
 	}
@@ -70,11 +64,11 @@ class Library extends React.Component {
 					return <Text style={styles.header}>Your library</Text>
 				}}
 				renderRow={bookName =>
-					<TouchableOpacity onPress={this.onBookSelect.bind(this, bookName)}>
+					<Link name="reader" query={{bookName: bookName}}>
 						<View style={styles.libraryRow}>
 							<Text>{bookName}</Text>
 						</View>
-					</TouchableOpacity>
+					</Link>
 				}
 			/>
 		</View>;

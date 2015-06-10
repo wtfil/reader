@@ -1,5 +1,5 @@
 var React = require('react-native');
-var {Navigator, View} = React;
+var {TouchableOpacity, Navigator, View} = React;
 var instance;
 
 class Route extends React.Component {}
@@ -38,6 +38,18 @@ class Router extends React.Component {
 
 }
 
+class Link extends React.Component {
+	render() {
+		return <TouchableOpacity
+			style={this.props.style}
+			children={this.props.children}
+			onPress={() => {
+				navigate(this.props.name, this.props.query)
+			}}
+		/>;
+	}
+}
+
 function navigate(name, props) {
 	instance.setState({
 		routeName: name,
@@ -45,4 +57,4 @@ function navigate(name, props) {
 	});
 }
 
-module.exports = { Route, Router, navigate };
+module.exports = { Route, Router, navigate, Link };

@@ -40,7 +40,9 @@ function getWords(text) {
 }
 
 class BookReader extends React.Component {
-	constructor() {
+	constructor(props) {
+		progress.set('currentBook', props.bookName);
+		super();
 		this.state = {
 			book: null,
 			quick: true,

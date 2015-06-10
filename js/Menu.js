@@ -1,19 +1,16 @@
 var React = require('react-native');
-var {navigate} = require('./Router');
-var {TouchableOpacity, StyleSheet, Text, View} = React;
+var {Link} = require('./Router');
+var {StyleSheet, Text, View} = React;
 
 class Menu extends React.Component {
 	constructor() {
 		super();
 	}
-	home() {
-		navigate('library');
-	}
 	render() {
 		return <View style={styles.main}>
-			<TouchableOpacity onPress={this.home.bind(this)}>
+			<Link name="library">
 				<Text>Home</Text>
-			</TouchableOpacity>
+			</Link>
 		</View>;
 	}
 }
