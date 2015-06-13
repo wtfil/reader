@@ -1,49 +1,141 @@
 var React = require('react-native');
 var qs = require('shitty-qs');
-var {StyleSheet, Text, View, Component, LinkingIOS, AsyncStorage} = React;
-var {Link} = require('./Router');
-var DROPBOX = {
-	appKey: 'o62umtq5zggnj9n',
-	redirectUri: 'react-reader://dropbox'
-};
+var {StyleSheet, Text, View, Component, LinkingIOS, AsyncStorage, TouchableOpacity} = React;
+var {navigate, Link} = require('./Router');
+var {FileUtil} = require('NativeModules');
+var dropbox = new Dropbox();
 
-function dropboxOauth(cb) {
-	AsyncStorage.getItem('dropbox', (err, dropbox) => {
-		if (dropbox) {
-			return cb(null, JSON.parse(dropbox));
+class Dropbox {
+	constructor() {
+		this.APP_KEY = 'o62umtq5zggnj9n';
+		this.REDIRECT_URI = 'react-reader://dropbox';
+	}
+	getToken() {
+		if (this.authPromise) {
+			return this.authPromise;
 		}
-		var url = `https://www.dropbox.com/1/oauth2/authorize?response_type=token&client_id=${DROPBOX.appKey}&redirect_uri=${DROPBOX.redirectUri}`
-		LinkingIOS.addEventListener('url', e => {
-			var query = qs(e.url.split('#')[1]);
-			LinkingIOS.removeEventListener('url');
-			AsyncStorage.setItem('dropbox', JSON.stringify(query));
-			cb(null, query);
+		this.authPromise = AsyncStorage.getItem('dropbox')
+			.then(data => {
+				return JSON.parse(data).access_token;
+			})
+			.catch(() => {
+				var url = `https://www.dropbox.com/1/oauth2/authorize?response_type=token&client_id=${this.APP_KEY}&redirect_uri=${this.REDIRECT_URI}`
+				return new Promise(resolve => {
+					LinkingIOS.addEventListener('url', e => {
+						var query = qs(e.url.split('#')[1]);
+						LinkingIOS.removeEventListener('url');
+						AsyncStorage.setItem('dropbox', JSON.stringify(query));
+						resolve(query.access_token);
+					});
+					LinkingIOS.openURL(url);
+				});
+			});
+		return this.authPromise;
+	}
+	call({endpoint, method, origin}) {
+		return this.getToken().then(token => {
+			return fetch(
+				`https://${origin}.dropbox.com/1/${endpoint}`,
+				{
+					method: method,
+					headers: {
+						'Authorization': `Bearer ${token}`
+					}
+				}
+			);
 		});
-		LinkingIOS.openURL(url);
+	}
+	content(path) {
+		return this.call({
+			endpoint: 'metadata/auto' + path,
+			method: 'get',
+			origin: 'api'
+		}).then(res => {
+			return res.json();
+		}).then(json => {
+			return json.contents;
+		});
+	}
+	download(path) {
+		return this.call({
+			endpoint: 'files/auto/' + path,
+			method: 'get',
+			origin: 'api-content'
+		}).then(res => {
+			return res.text();
+		});
+	}
+}
+
+
+function downloadFile(path) {
+	var name = path.split('/').pop();
+	dropbox.download(path).then(text => {
+		FileUtil.writeFile('books/' + name, text, err => {
+			if (err) {
+				console.log(err);
+			}
+			navigate('reader', {bookName: name});
+		});
 	});
 }
 
 class Upload extends Component {
 	constructor() {
 		super();
-		this.state = {query: null};
+		this.state = {
+			files: [],
+			cursor: '/'
+		};
 	}
-	componentDidMount() {
-		dropboxOauth((err, query) => {
+	updateFiles(cursor) {
+		dropbox.content(cursor).then(contents => {
 			this.setState({
-				query: query
+				files: contents,
+				cursor: cursor
 			});
 		});
 	}
+	componentWillMount() {
+		this.updateFiles('/');
+	}
+	back() {
+		var cursor = this.state.cursor.split('/').slice(0, -1).join('/');
+		this.updateFiles(cursor);
+	}
 	render() {
 		return <View>
-			<Text>
-				{JSON.stringify(this.state.query)}
-			</Text>
+			<TouchableOpacity onPress={this.back.bind(this)}>
+				<Text>Back</Text>
+			</TouchableOpacity>
+			<Link name="library">
+				<Text>Library</Text>
+			</Link>
+			<View style={styles.list}>
+				{this.state.files.map(file => {
+					return <View>
+						<TouchableOpacity onPress={() => {
+							if (file.is_dir) {
+								this.updateFiles(file.path);
+							} else {
+								downloadFile(file.path);
+							}
+						}}>
+							<Text>
+								{file.path.slice(1) + (file.is_dir ? '/' : '')}
+							</Text>
+						</TouchableOpacity>
+					</View>
+				})}
+			</View>
 		</View>;
 	}
 }
 
-var styles = StyleSheet.create({});
+var styles = StyleSheet.create({
+	list: {
+		paddingTop: 10
+	}
+});
 
 module.exports = Upload;
