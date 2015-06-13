@@ -1,64 +1,49 @@
 var React = require('react-native');
-var {TextInput, StyleSheet, Text, View} = React;
-var {FileUtil} = require('NativeModules');
+var qs = require('shitty-qs');
+var {StyleSheet, Text, View, Component, LinkingIOS, AsyncStorage} = React;
 var {Link} = require('./Router');
+var DROPBOX = {
+	appKey: 'o62umtq5zggnj9n',
+	redirectUri: 'react-reader://dropbox'
+};
 
-class Upload extends React.Component {
+function dropboxOauth(cb) {
+	AsyncStorage.getItem('dropbox', (err, dropbox) => {
+		if (dropbox) {
+			return cb(null, JSON.parse(dropbox));
+		}
+		var url = `https://www.dropbox.com/1/oauth2/authorize?response_type=token&client_id=${DROPBOX.appKey}&redirect_uri=${DROPBOX.redirectUri}`
+		LinkingIOS.addEventListener('url', e => {
+			var query = qs(e.url.split('#')[1]);
+			LinkingIOS.removeEventListener('url');
+			AsyncStorage.setItem('dropbox', JSON.stringify(query));
+			cb(null, query);
+		});
+		LinkingIOS.openURL(url);
+	});
+}
+
+class Upload extends Component {
 	constructor() {
 		super();
-		this.state = {
-			url: 'https://google.com',
-			error: null,
-			donloaded: null
-		};
+		this.state = {query: null};
 	}
-	onChange(e) {
-		var url = e.nativeEvent.text;
-		var name = url.split('/').pop();
-		fetch(url)
-			.then(data => data.text())
-			.then(text => {
-				FileUtil.writeFile(`books/${name}`, text, err => {
-					this.setState({
-						donloaded: !err && name,
-						error: err
-					});
-				});
-			})
-			.catch(alert);
-		this.setState({
-			url: url
+	componentDidMount() {
+		dropboxOauth((err, query) => {
+			this.setState({
+				query: query
+			});
 		});
-
 	}
 	render() {
 		return <View>
-			<TextInput
-				style={styles.input}
-				value={this.state.url}
-				onSubmitEditing={this.onChange.bind(this)}
-			/>
-			<Link name="library">
-				<Text>Back</Text>
-			</Link>
-			{this.state.donloaded &&
-				<Text>Uploaded {this.state.donloaded}</Text>
-			}
-			{this.state.error &&
-				<Text>{this.setState.error}</Text>
-			}
+			<Text>
+				{JSON.stringify(this.state.query)}
+			</Text>
 		</View>;
 	}
 }
 
-var styles = StyleSheet.create({
-	webView: {
-		flex: 1,
-		height: 400
-	},
-	input: {
-		height: 20
-	}
-});
+var styles = StyleSheet.create({});
 
 module.exports = Upload;

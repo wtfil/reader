@@ -10,6 +10,7 @@ var {Route, Router, navigate} = require('./js/Router');
 
 class App extends React.Component {
 	componentDidMount() {
+		return navigate('upload');
 		progress.get((err, progress) => {
 			if (progress && progress.currentBook) {
 				navigate('reader', {bookName: progress.currentBook});
