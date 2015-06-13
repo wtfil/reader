@@ -23,7 +23,7 @@ var styles = StyleSheet.create({
 		position: 'absolute',
 		top: 0,
 		left: 0,
-		right: 0,
+		right: -14,
 		padding: 10,
 		backgroundColor: '#6CE8F8',
 		flexDirection: 'row'

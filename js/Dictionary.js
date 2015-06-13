@@ -5,7 +5,6 @@ var translate = require('./translate');
 
 function parseTime(timestamp) {
 	var minutes = (Date.now() - timestamp) / 1000 / 60;
-	console.log(minutes);
 	if (minutes < 60) {
 		return `${~~minutes}m`
 	} else if (minutes < 60 * 24) {

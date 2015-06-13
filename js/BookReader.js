@@ -97,14 +97,16 @@ class BookReader extends React.Component {
 		this.updateOffset(-1);
 	}
 	onWordPress(word) {
-		if (!/^\w+$/.test(word)) {
-			return this.closeTranslated();
+		var isWord = null;
+		var translated;
+		if (/^\w+$/.test(word)) {
+			isWord = true;
+			translated = translate({text: word});
+			LayoutAnimation.configureNext(easeInEaseOut);
 		}
-		var translated = translate({text: word});
-		LayoutAnimation.configureNext(easeInEaseOut);
 		this.setState({
 			showMenu: false,
-			translated: {
+			translated: isWord && {
 				word: word,
 				translated: translated || 'No translation'
 			}
@@ -119,7 +121,7 @@ class BookReader extends React.Component {
 	onWordTouchUp(e, bookReader) {
 		var touch = e.touchHistory.touchBank[1];
 		var diff = touch.currentPageX - touch.startPageX;
-		if (Math.abs(diff) < 5) {
+		if (Math.abs(diff) < 30) {
 			if (touch.currentTimeStamp - touch.startTimeStamp > 300) {
 				bookReader.showMenu();
 			} else {
@@ -205,8 +207,8 @@ var styles = StyleSheet.create({
 		position: 'absolute',
 		bottom: 0,
 		padding: 10,
-		width: 1000,
-		left: -10,
+		left: 0,
+		right: -14,
 		backgroundColor: '#FAFAC3'
 	},
 	text: {
@@ -220,9 +222,9 @@ var styles = StyleSheet.create({
 	progress: {
 		height: 3,
 		position: 'absolute',
-		left: 0,
+		left: 7,
 		right: 0,
-		bottom: 0,
+		bottom: 7,
 		borderWidth: 1
 	},
 	progressIndecator: {

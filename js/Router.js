@@ -20,7 +20,7 @@ class Router extends React.Component {
 
 	render() {
 		var {children} = this.props;
-		var item;
+		var item, i;
 
 		children = [].concat(children);
 		children.forEach(item => {
@@ -28,7 +28,8 @@ class Router extends React.Component {
 				throw new Error(`Only <Route/> could be passed to Router, but <${item.type.prototype.constructor.name}/> given`);
 			}
 		});
-		for (item of children) {
+		for (i = 0; i < children.length; i++) {
+			item = children[i];
 			if (item.props.name === this.state.routeName) {
 				return <item.props.handler {...this.state.routeProps}/>;
 			}
