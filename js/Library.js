@@ -45,9 +45,9 @@ class Library extends React.Component {
 				dataSource={this.state.books}
 				renderSectionHeader={() => {
 					return <View style={styles.header}>
-					 	 <Text >Your library</Text>
-						 <Link name="upload">
-						 	<Text style={styles.upload}>Add+</Text>
+					 	 <Text style={styles.headerText}>Your library</Text>
+						 <Link name="dropbox">
+						 	<Text style={styles.upload}>Dropbox</Text>
 						 </Link>
 					</View>
 				}}
@@ -72,8 +72,10 @@ var styles = StyleSheet.create({
 		fontSize: 18,
 		marginBottom: 10
 	},
+	headerText: {
+		marginRight: 10
+	},
 	upload: {
-		marginLeft: 10,
 		color: 'green'
 	}
 });

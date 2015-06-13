@@ -1,11 +1,11 @@
 var React = require('react-native');
-var qs = require('shitty-qs');
+var qs = require('qs');
 var {StyleSheet, Text, View, Component, LinkingIOS, AsyncStorage, TouchableOpacity} = React;
 var {navigate, Link} = require('./Router');
 var {FileUtil} = require('NativeModules');
-var dropbox = new Dropbox();
+var api = new DropboxApi();
 
-class Dropbox {
+class DropboxApi {
 	constructor() {
 		this.APP_KEY = 'o62umtq5zggnj9n';
 		this.REDIRECT_URI = 'react-reader://dropbox';
@@ -19,10 +19,14 @@ class Dropbox {
 				return JSON.parse(data).access_token;
 			})
 			.catch(() => {
-				var url = `https://www.dropbox.com/1/oauth2/authorize?response_type=token&client_id=${this.APP_KEY}&redirect_uri=${this.REDIRECT_URI}`
+				var url = 'https://www.dropbox.com/1/oauth2/authorize?' + qs.stringify({
+					response_type: 'token',
+					client_id: this.APP_KEY,
+					redirect_uri: this.REDIRECT_URI
+				});
 				return new Promise(resolve => {
 					LinkingIOS.addEventListener('url', e => {
-						var query = qs(e.url.split('#')[1]);
+						var query = qs.parse(e.url.split('#')[1]);
 						LinkingIOS.removeEventListener('url');
 						AsyncStorage.setItem('dropbox', JSON.stringify(query));
 						resolve(query.access_token);
@@ -70,7 +74,7 @@ class Dropbox {
 
 function downloadFile(path) {
 	var name = path.split('/').pop();
-	dropbox.download(path).then(text => {
+	api.download(path).then(text => {
 		FileUtil.writeFile('books/' + name, text, err => {
 			if (err) {
 				console.log(err);
@@ -80,7 +84,7 @@ function downloadFile(path) {
 	});
 }
 
-class Upload extends Component {
+class Dropbox extends Component {
 	constructor() {
 		super();
 		this.state = {
@@ -89,7 +93,7 @@ class Upload extends Component {
 		};
 	}
 	updateFiles(cursor) {
-		dropbox.content(cursor).then(contents => {
+		api.content(cursor).then(contents => {
 			this.setState({
 				files: contents,
 				cursor: cursor
@@ -138,4 +142,4 @@ var styles = StyleSheet.create({
 	}
 });
 
-module.exports = Upload;
+module.exports = Dropbox;

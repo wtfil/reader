@@ -3,7 +3,7 @@ var {AppRegistry, StyleSheet, View} = React;
 var BookReader = require('./js/BookReader');
 var Library = require('./js/Library');
 var Settings = require('./js/Settings');
-var Upload = require('./js/Upload');
+var Dropbox = require('./js/Dropbox');
 var Dictionary = require('./js/Dictionary');
 var progress = require('./js/progress');
 var {Route, Router, navigate} = require('./js/Router');
@@ -24,7 +24,7 @@ class App extends React.Component {
 				<Route name="library" handler={Library} />
 				<Route name="reader" handler={BookReader} />
 				<Route name="settings" handler={Settings} />
-				<Route name="upload" handler={Upload} />
+				<Route name="dropbox" handler={Dropbox} />
 				<Route name="dictionary" handler={Dictionary} />
 			</Router>
 		</View>;
