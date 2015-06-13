@@ -54,7 +54,7 @@ class Library extends React.Component {
 		});
 	}
 	render() {
-		return <View>
+		return <View style={styles.main}>
 			<ListView
 				dataSource={this.state.books}
 				renderSectionHeader={() => {
@@ -78,6 +78,9 @@ class Library extends React.Component {
 }
 
 var styles = StyleSheet.create({
+	main: {
+		paddingHorizontal: 7
+	},
 	header: {
 		flexDirection: 'row',
 		fontSize: 18,

@@ -67,6 +67,9 @@ class Dictionary extends React.Component {
 			dataSource={this.getDS()}
 			renderSectionHeader={() => {
 				return <View style={styles.header}>
+					<Link name="library">
+						<Text>B</Text>
+					</Link>
 					<TouchableOpacity onPress={this.sortBy.bind(this, 'original')}>
 						<Text style={styles.original}>Original</Text>
 					</TouchableOpacity>
