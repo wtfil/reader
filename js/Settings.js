@@ -1,10 +1,13 @@
 var React = require('react-native');
 var {StyleSheet, Text, View} = React;
+var {Link} = require('./Router');
 
 class Settings extends React.Component {
 	render() {
 		return <View>
-			<Text>asdasd</Text>
+			<Link name="library">
+				<Text>Back</Text>
+			</Link>
 		</View>;
 	}
 }

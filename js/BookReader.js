@@ -191,6 +191,7 @@ class BookReader extends React.Component {
 
 var styles = StyleSheet.create({
 	main: {
+		paddingHorizontal: 7,
 		top: 0,
 		bottom: 0,
 		flex: 1,

@@ -11,6 +11,9 @@ class Menu extends React.Component {
 			<Link style={styles.item} name="settings">
 				<Text>Settings</Text>
 			</Link>
+			<Link style={styles.item} name="dictionary">
+				<Text>Dictionary</Text>
+			</Link>
 		</View>;
 	}
 }

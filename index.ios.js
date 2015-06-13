@@ -4,12 +4,12 @@ var BookReader = require('./js/BookReader');
 var Library = require('./js/Library');
 var Settings = require('./js/Settings');
 var Upload = require('./js/Upload');
+var Dictionary = require('./js/Dictionary');
 var progress = require('./js/progress');
 var {Route, Router, navigate} = require('./js/Router');
 
 class App extends React.Component {
 	componentDidMount() {
-		return navigate('upload');
 		progress.get((err, progress) => {
 			if (progress && progress.currentBook) {
 				navigate('reader', {bookName: progress.currentBook});
@@ -25,6 +25,7 @@ class App extends React.Component {
 				<Route name="reader" handler={BookReader} />
 				<Route name="settings" handler={Settings} />
 				<Route name="upload" handler={Upload} />
+				<Route name="dictionary" handler={Dictionary} />
 			</Router>
 		</View>;
 	}
@@ -33,9 +34,6 @@ class App extends React.Component {
 var styles = StyleSheet.create({
 	container: {
 		paddingTop: 30,
-		paddingLeft: 7,
-		paddingRight: 7,
-		paddingBottom: 7,
 		flex: 1,
 		backgroundColor: '#F5FCFF'
 	}
