@@ -1,5 +1,6 @@
 var React = require('react-native');
-var {ScreenUtil, FileUtil} = require('NativeModules');
+var {ScreenUtil} = require('NativeModules');
+var fs = require('./fs');
 var {LayoutAnimation, StyleSheet, Text, View} = React;
 var progress = require('./progress');
 var translate = require('./translate');
@@ -39,7 +40,13 @@ function getWords(text) {
 	return text.split(/([^\w])/);
 }
 
+/*console.log(FileUtil.readFile('books/text.txt'));*/
+
 class BookReader extends React.Component {
+	static async routerWillRun(props) {
+		/*var book = await FileUtil.readFile('books/' + props.bookName);*/
+	}
+
 	constructor(props) {
 		progress.set('currentBook', props.bookName);
 		super();
@@ -52,12 +59,12 @@ class BookReader extends React.Component {
 		};
 	}
 	componentWillMount() {
-		FileUtil.readFile('books/' + this.props.bookName, onError, data => {
+		fs.readFile('books/' + this.props.bookName).then(data => {
 			this.setState({
 				book: data,
 				timer: this.getSlowUpdateTimer()
 			});
-		});
+		}).catch(onError);
 		progress.get((err, progress) => {
 			var current = progress.books && progress.books[this.props.bookName];
 			if (!current) {
