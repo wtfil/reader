@@ -185,7 +185,9 @@ class BookReader extends React.Component {
 				</View>
 			}
 			{this.state.showMenu &&
-				<Menu {...this.props}/>
+				<View style={styles.menu}>
+					<Menu {...this.props}/>
+				</View>
 			}
 		</View>;
   	}
@@ -197,6 +199,12 @@ var styles = StyleSheet.create({
 		top: 0,
 		bottom: 0,
 		flex: 1,
+	},
+	menu: {
+		position: 'absolute',
+		left: 0,
+		right: -14,
+		top: 0
 	},
 	position: {
 		fontSize: 6,

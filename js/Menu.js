@@ -20,10 +20,6 @@ class Menu extends React.Component {
 
 var styles = StyleSheet.create({
 	main: {
-		position: 'absolute',
-		top: 0,
-		left: 0,
-		right: -14,
 		padding: 10,
 		backgroundColor: '#6CE8F8',
 		flexDirection: 'row'
