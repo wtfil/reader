@@ -1,6 +1,5 @@
 var React = require('react-native');
-var {ScreenUtil} = require('NativeModules');
-var fs = require('./fs');
+var {FileUtil, ScreenUtil} = require('NativeModules');
 var {LayoutAnimation, StyleSheet, Text, View} = React;
 var progress = require('./progress');
 var translate = require('./translate');
@@ -40,44 +39,34 @@ function getWords(text) {
 	return text.split(/([^\w])/);
 }
 
-/*console.log(FileUtil.readFile('books/text.txt'));*/
-
 class BookReader extends React.Component {
+
 	static async routerWillRun(props) {
-		/*var book = await FileUtil.readFile('books/' + props.bookName);*/
+		var book = await FileUtil.readFile('books/' + props.bookName);
+		var p = await progress.get();
+		return {
+			book: book,
+			progress: p
+		};
 	}
 
 	constructor(props) {
+		var p = props.progress;
 		progress.set('currentBook', props.bookName);
 		super();
 		this.state = {
-			book: null,
+			book: props.book,
 			quick: true,
-			offset: 0,
-			timer: null,
+			offset: p && p.books && p.books[props.bookName] && p.books[props.bookName].offset || 0,
+			timer: getSlowUpdateTimer(),
 			showMenu: false
 		};
 	}
-	componentWillMount() {
-		fs.readFile('books/' + this.props.bookName).then(data => {
-			this.setState({
-				book: data,
-				timer: this.getSlowUpdateTimer()
-			});
-		}).catch(onError);
-		progress.get((err, progress) => {
-			var current = progress.books && progress.books[this.props.bookName];
-			if (!current) {
-				return;
-			}
-			this.setState({
-				offset: current.offset || 0
-			});
-		});
-	}
+
 	getSlowUpdateTimer() {
 		return setTimeout(this.setState.bind(this, {quick: false, timer: null}), 0);
 	}
+
 	updateOffset(sign) {
 		var offset = getNewOffset({
 			text: this.state.book,

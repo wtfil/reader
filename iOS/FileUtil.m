@@ -32,9 +32,9 @@ RCT_EXPORT_METHOD(readDir: (NSString *)dirName
 
 
 RCT_EXPORT_METHOD(readFile: (NSString *)fileName
-                  errorCallback: (RCTResponseSenderBlock)failureCallback
-                  callback: (RCTResponseSenderBlock)successCallback) {
-    
+                  resolver:(RCTPromiseResolveBlock)resolve
+                  rejecter:(RCTPromiseRejectBlock)reject) {
+  
     NSString *documentsDirectory = getDocumentsRoot();
     
     fileName = [NSString stringWithFormat:@"%@/%@", documentsDirectory, fileName];
@@ -44,11 +44,11 @@ RCT_EXPORT_METHOD(readFile: (NSString *)fileName
                               initWithContentsOfFile: fileName
                               usedEncoding : nil
                               error: &error];
-    
+  k
     if (error) {
-        failureCallback(@[[error localizedDescription]]);
+        reject(error);
     } else {
-        successCallback(@[fileContents]);
+        resolve(fileContents);
     }
 }
 

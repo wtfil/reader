@@ -4,6 +4,14 @@ var instance;
 
 class Route extends React.Component {}
 
+class ErrorRoute extends React.Component {
+	render() {
+		return <View>
+			{this.props.error}
+		</View>;
+	}
+}
+
 class Router extends React.Component {
 
 	constructor (props) {
@@ -13,28 +21,53 @@ class Router extends React.Component {
 		super();
 		instance = this;
 		this.state = {
-			routeName: props.initialRoute,
+			routeHandler: null,
 			routeProps: {}
 		};
 	}
 
-	render() {
-		var {children} = this.props;
-		var item, i;
+	async navigate(name, props) {
+		var handler = this.getRoute(name);
+		var asyncData;
 
-		children = [].concat(children);
+		if (handler.routerWillRun) {
+			try {
+				asyncData = await handler.routerWillRun(props);
+			} catch (e) {
+				return this.setState({
+					routeHandler: ErrorRoute,
+					routeProps: {error: e}
+				});
+			};
+		}
+		this.setState({
+			routeHandler: handler,
+			routeProps: {...props, ...asyncData}
+		});
+	}
+
+	getRoute(name) {
+		var children = [].concat(this.props.children);
+		var item, i;
+		for (i = 0; i < children.length; i++) {
+			item = children[i];
+			if (item.props.name === name) {
+				return item.props.handler;
+			}
+		}
+		return null;
+	}
+
+	render() {
+		return this.state.routeHandler &&
+			<this.state.routeHandler {...this.state.routeProps} />;
+		/*
 		children.forEach(item => {
 			if (item.type.prototype.constructor !== Route) {
 				throw new Error(`Only <Route/> could be passed to Router, but <${item.type.prototype.constructor.name}/> given`);
 			}
 		});
-		for (i = 0; i < children.length; i++) {
-			item = children[i];
-			if (item.props.name === this.state.routeName) {
-				return <item.props.handler {...this.state.routeProps}/>;
-			}
-		}
-		return null;
+		*/
 	}
 
 }
@@ -52,11 +85,8 @@ class Link extends React.Component {
 	}
 }
 
-function navigate(name, props) {
-	instance.setState({
-		routeName: name,
-		routeProps: props
-	});
+function navigate(...args) {
+	instance.navigate(...args);
 }
 
 module.exports = { Route, Router, navigate, Link };

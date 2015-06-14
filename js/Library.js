@@ -27,6 +27,7 @@ function readBooksDir(cb) {
 
 class Library extends React.Component {
 	constructor() {
+		super();
 		this.state = {
 			books: arrToDS([])
 		};

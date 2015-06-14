@@ -3,7 +3,6 @@ var qs = require('qs');
 var {StyleSheet, Text, View, Component, LinkingIOS, AsyncStorage, TouchableOpacity} = React;
 var {navigate, Link} = require('./Router');
 var {FileUtil} = require('NativeModules');
-var api = new DropboxApi();
 
 class DropboxApi {
 	constructor() {
@@ -71,6 +70,7 @@ class DropboxApi {
 	}
 }
 
+var api = new DropboxApi();
 
 function downloadFile(path) {
 	var name = path.split('/').pop();

@@ -1,3 +1,4 @@
+require('regenerator/runtime');
 var React = require('react-native');
 var {AppRegistry, StyleSheet, View} = React;
 var BookReader = require('./js/BookReader');
@@ -9,14 +10,13 @@ var progress = require('./js/progress');
 var {Route, Router, navigate} = require('./js/Router');
 
 class App extends React.Component {
-	componentDidMount() {
-		progress.get((err, progress) => {
-			if (progress && progress.currentBook) {
-				navigate('reader', {bookName: progress.currentBook});
-			} else {
-				navigate('library');
-			}
-		});
+	async componentDidMount() {
+		var p = await progress.get();
+		if (p && p.currentBook) {
+			navigate('reader', {bookName: p.currentBook});
+		} else {
+			navigate('library');
+		}
 	}
 	render() {
 		return <View style={styles.container}>
