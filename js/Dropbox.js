@@ -3,61 +3,62 @@ var qs = require('qs');
 var {StyleSheet, Text, View, Component, LinkingIOS, AsyncStorage, TouchableOpacity} = React;
 var {navigate, Link} = require('./Router');
 var {FileUtil} = require('NativeModules');
+var storage = require('./storage');
 
 class DropboxApi {
 	constructor() {
 		this.APP_KEY = 'o62umtq5zggnj9n';
 		this.REDIRECT_URI = 'react-reader://dropbox';
 	}
-	getToken() {
-		if (this.authPromise) {
-			return this.authPromise;
+	async getToken() {
+		if (this.token) {
+			return this.token;
 		}
-		this.authPromise = AsyncStorage.getItem('dropbox')
-			.then(data => {
-				return JSON.parse(data).access_token;
-			})
-			.catch(() => {
-				var url = 'https://www.dropbox.com/1/oauth2/authorize?' + qs.stringify({
-					response_type: 'token',
-					client_id: this.APP_KEY,
-					redirect_uri: this.REDIRECT_URI
-				});
-				return new Promise(resolve => {
-					LinkingIOS.addEventListener('url', e => {
-						var query = qs.parse(e.url.split('#')[1]);
-						LinkingIOS.removeEventListener('url');
-						AsyncStorage.setItem('dropbox', JSON.stringify(query));
-						resolve(query.access_token);
-					});
-					LinkingIOS.openURL(url);
-				});
-			});
-		return this.authPromise;
-	}
-	call({endpoint, method, origin}) {
-		return this.getToken().then(token => {
-			return fetch(
-				`https://${origin}.dropbox.com/1/${endpoint}`,
-				{
-					method: method,
-					headers: {
-						'Authorization': `Bearer ${token}`
-					}
-				}
-			);
+		var authData = await storage.get('dropbox');
+		if (authData) {
+			this.token = authData.access_token;
+			return this.token;
+		}
+
+		var url = 'https://www.dropbox.com/1/oauth2/authorize?' + qs.stringify({
+			response_type: 'token',
+			client_id: this.APP_KEY,
+			redirect_uri: this.REDIRECT_URI
 		});
+		authData = await new Promise(resolve => {
+			LinkingIOS.addEventListener('url', e => {
+				var query = qs.parse(e.url.split('#')[1]);
+				LinkingIOS.removeEventListener('url');
+				AsyncStorage.setItem('dropbox', JSON.stringify(query));
+				resolve(query.access_token);
+			});
+			LinkingIOS.openURL(url);
+		});
+		await storage.set('dropbox', authData);
+		this.token = authData.access_token;
+		return this.token;
 	}
-	content(path) {
-		return this.call({
+
+	async call({endpoint, method, origin}) {
+		var token = await this.getToken();
+		return fetch(
+			`https://${origin}.dropbox.com/1/${endpoint}`,
+			{
+				method: method,
+				headers: {
+					'Authorization': `Bearer ${token}`
+				}
+			}
+		);
+	}
+	async content(path) {
+		var res = await this.call({
 			endpoint: 'metadata/auto' + path,
 			method: 'get',
 			origin: 'api'
-		}).then(res => {
-			return res.json();
-		}).then(json => {
-			return json.contents;
 		});
+		var json = await res.json();
+		return json.contents;
 	}
 	download(path) {
 		return this.call({
@@ -72,36 +73,32 @@ class DropboxApi {
 
 var api = new DropboxApi();
 
-function downloadFile(path) {
+async function downloadFile(path) {
 	var name = path.split('/').pop();
-	api.download(path).then(text => {
-		FileUtil.writeFile('books/' + name, text, err => {
-			if (err) {
-				console.log(err);
-			}
-			navigate('reader', {bookName: name});
-		});
-	});
+	var text = await api.download(path);
+	await FileUtil.writeFile('books/' + name, text);
+	navigate('reader', {bookName: name});
 }
 
 class Dropbox extends Component {
-	constructor() {
+	static async routerWillRun() {
+		return {
+			files: await api.content('/')
+		};
+	}
+
+	constructor(props) {
 		super();
 		this.state = {
-			files: [],
+			files: props.files,
 			cursor: '/'
 		};
 	}
-	updateFiles(cursor) {
-		api.content(cursor).then(contents => {
-			this.setState({
-				files: contents,
-				cursor: cursor
-			});
+	async updateFiles(cursor) {
+		this.setState({
+			files: await api.content(cursor),
+			cursor: cursor
 		});
-	}
-	componentWillMount() {
-		this.updateFiles('/');
 	}
 	back() {
 		var cursor = this.state.cursor.split('/').slice(0, -1).join('/');

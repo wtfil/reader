@@ -11,6 +11,7 @@ var {Route, Router, navigate} = require('./js/Router');
 
 class App extends React.Component {
 	async componentDidMount() {
+		return navigate('dropbox');
 		var currentBook = await storage.get('progress..currentBook');
 		if (currentBook) {
 			navigate('reader', {bookName: currentBook});

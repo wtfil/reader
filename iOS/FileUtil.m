@@ -53,7 +53,8 @@ RCT_EXPORT_METHOD(readFile: (NSString *)fileName
 
 RCT_EXPORT_METHOD(writeFile: (NSString *)fileName
                   withContents:(NSString *)contents
-                  callback: (RCTResponseSenderBlock)callback) {
+                  resolver:(RCTPromiseResolveBlock)resolve
+                  rejecter:(RCTPromiseRejectBlock)reject) {
     
     NSString *documentsDirectory = getDocumentsRoot();
     
@@ -65,12 +66,16 @@ RCT_EXPORT_METHOD(writeFile: (NSString *)fileName
                //encoding: NSStringEncodingConversionAllowLossy
                encoding: NSUTF8StringEncoding
                error: &error];
-    
-    callback(error ? @[[error localizedDescription]] : @[[NSNull null]]);
+    if (error) {
+      reject(error);
+    } else {
+      resolve(nil);
+    }
 }
 
 RCT_EXPORT_METHOD(createDir: (NSString *)dirName
-                  callback: (RCTResponseSenderBlock)callback) {
+                  resolver:(RCTPromiseResolveBlock)resolve
+                  rejecter:(RCTPromiseRejectBlock)reject) {
 
     NSString *documentsDirectory = getDocumentsRoot();
     dirName = [NSString stringWithFormat:@"%@/%@", documentsDirectory, dirName];
@@ -81,8 +86,11 @@ RCT_EXPORT_METHOD(createDir: (NSString *)dirName
         withIntermediateDirectories: YES
         attributes: nil
         error: &error];
-    
-    callback(error ? @[[error localizedDescription]] : @[[NSNull null]]);
+    if (error) {
+      reject(error);
+    } else {
+      resolve(nil);
+    }
 }
 
 

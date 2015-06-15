@@ -18,6 +18,7 @@ class Library extends React.Component {
 		try {
 			library = await FileUtil.readDir('books');
 		} catch (e) {
+			await FileUtil.createDir('books');
 			library = [];
 		};
 		return {library};
