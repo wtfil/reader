@@ -6,14 +6,14 @@ var Library = require('./js/Library');
 var Settings = require('./js/Settings');
 var Dropbox = require('./js/Dropbox');
 var Dictionary = require('./js/Dictionary');
-var progress = require('./js/progress');
+var storage = require('./js/storage');
 var {Route, Router, navigate} = require('./js/Router');
 
 class App extends React.Component {
 	async componentDidMount() {
-		var p = await progress.get();
-		if (p && p.currentBook) {
-			navigate('reader', {bookName: p.currentBook});
+		var currentBook = await storage.get('progress..currentBook');
+		if (currentBook) {
+			navigate('reader', {bookName: currentBook});
 		} else {
 			navigate('library');
 		}

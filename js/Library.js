@@ -1,7 +1,7 @@
 var React = require('react-native');
 var {FileUtil} = require('NativeModules');
 var {ListView, StyleSheet, Text, View} = React;
-var progress = require('./progress');
+var storage = require('./storage');
 var {Link} = require('./Router');
 
 function arrToDS(arr) {
@@ -11,34 +11,24 @@ function arrToDS(arr) {
 	return ds.cloneWithRows(arr);
 }
 
-function readBooksDir(cb) {
-	FileUtil.readDir(
-		'books',
-		err => {
-			FileUtil.createDir('books', err => {
-				return cb(err);
-			});
-		},
-		data => {
-			cb(null, data);
-		}
-	);
-}
-
 class Library extends React.Component {
-	constructor() {
-		super();
-		this.state = {
-			books: arrToDS([])
+
+	static async routerWillRun(props) {
+		var library;
+		try {
+			library = await FileUtil.readDir('books');
+		} catch (e) {
+			library = [];
 		};
+		return {library};
 	}
-	componentWillMount() {
-		readBooksDir((err, books) => {
-			if (err) {
-				return console.error(err);
-			}
-			this.setState({books: arrToDS(books)});
-		});
+
+	constructor(props) {
+		super();
+		storage.set('progress..currentBook', null);
+		this.state = {
+			books: arrToDS(props.library)
+		};
 	}
 	render() {
 		return <View style={styles.main}>

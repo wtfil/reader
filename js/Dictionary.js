@@ -26,25 +26,25 @@ class Word extends React.Component {
 }
 
 class Dictionary extends React.Component {
+	static async routerWillRun() {
+		return {
+			words: await translate.getItems()
+		};
+	}
 	constructor() {
 		super();
 		this.state = {
 			sortKey: 'counter',
-			order: 1,
-			words: []
+			order: 1
 		};
-		translate.getItems((err, items) => {
-			this.setState({words: items});
-		});
 	}
 	getDS() {
 		var key = this.state.sortKey;
-		var words = this.state.words;
 		var order = this.state.order;
 		var ds = new ListView.DataSource({
 			rowHasChanged: (r1, r2) => true
 		});
-		var arr = this.state.words
+		var arr = this.props.words
 			.slice()
 			.sort((a, b) => {
 				if (typeof a[key] === 'string') {

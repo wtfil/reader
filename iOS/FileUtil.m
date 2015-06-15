@@ -12,9 +12,8 @@ NSString* getDocumentsRoot() {
 
 
 RCT_EXPORT_METHOD(readDir: (NSString *)dirName
-                  errorCallback: (RCTResponseSenderBlock)failureCallback
-                  callback: (RCTResponseSenderBlock)successCallback
-                  ) {
+                  resolver:(RCTPromiseResolveBlock)resolve
+                  rejecter:(RCTPromiseRejectBlock)reject) {
     
     NSString *documentsDirectory = getDocumentsRoot();
     dirName = [NSString stringWithFormat:@"%@/%@", documentsDirectory, dirName];
@@ -22,11 +21,11 @@ RCT_EXPORT_METHOD(readDir: (NSString *)dirName
     NSArray* dir = [[NSFileManager defaultManager]
                     contentsOfDirectoryAtPath: dirName
                     error: &error];
-
+  
     if (error) {
-        failureCallback(@[[error localizedDescription]]);
+        reject(error);
     } else {
-        successCallback(@[dir]);
+        resolve(dir);
     }
 }
 
@@ -44,7 +43,7 @@ RCT_EXPORT_METHOD(readFile: (NSString *)fileName
                               initWithContentsOfFile: fileName
                               usedEncoding : nil
                               error: &error];
-  k
+  
     if (error) {
         reject(error);
     } else {

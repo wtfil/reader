@@ -1,46 +1,44 @@
-var {AsyncStorage} = require('react-native');
+var storage = require('./storage');
 var dictionary = require('./translate-en-ru-clean.json');
 
 function translate({text}) {
 	return dictionary[text.toLowerCase()];
 }
-function save({text, translated}) {
-	AsyncStorage.getItem('translations', (e, translations) => {
-		try {
-			translations = JSON.parse(translations) || {};
-		} catch (e) {
-			translations = {};
+async function save({text, translated}) {
+	var translations;
+	try {
+		translations = await storage.get('translations');
+	} catch (e) {
+		translations = {};
+	};
+	if (!translations[text]) {
+		translations[text] = {
+			translated: translated,
+			from: 'en',
+			to: 'ru',
+			counter: 0
 		};
-		if (!translations[text]) {
-			translations[text] = {
-				translated: translated,
-				from: 'en',
-				to: 'ru',
-				counter: 0
-			};
-		}
-		translations[text].counter ++;
-		translations[text].lastTime = Date.now();
-		AsyncStorage.setItem('translations', JSON.stringify(translations));
-	})
+	}
+	translations[text].counter ++;
+	translations[text].lastTime = Date.now();
+
+	return storage.set('translations', translations);
 }
+
 function translateAndSave(opts) {
 	var translated = translate(opts);
-	save(Object.assign({translated: translated}, opts));
+	save({translated, ...opts});
 	return translated;
 }
-function getItems(cb) {
-	AsyncStorage.getItem('translations', (err, items) => {
-		if (err) {
-			return cb(err);
-		}
-		items = JSON.parse(items);
-		items = Object.keys(items).map(key => {
-			return Object.assign({
-				original: key
-			}, items[key]);
-		});
-		cb(null, items);
+async function getItems(cb) {
+	var translations;
+	try {
+		translations = await storage.get('translations');
+	} catch (e) {
+		translations = {};
+	};
+	return Object.keys(translations).map(key => {
+		return {original: key, ...translations[key]};
 	});
 }
 

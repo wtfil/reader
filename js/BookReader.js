@@ -1,7 +1,7 @@
 var React = require('react-native');
 var {FileUtil, ScreenUtil} = require('NativeModules');
 var {LayoutAnimation, StyleSheet, Text, View} = React;
-var progress = require('./progress');
+var storage = require('./storage');
 var translate = require('./translate');
 var Menu = require('./Menu');
 
@@ -43,28 +43,30 @@ class BookReader extends React.Component {
 
 	static async routerWillRun(props) {
 		var book = await FileUtil.readFile('books/' + props.bookName);
-		var p = await progress.get();
-		return {
-			book: book,
-			progress: p
-		};
+		var offset = await storage.get(`progress..books..${props.bookName}..offset`);
+		return {book, offset};
 	}
 
 	constructor(props) {
-		var p = props.progress;
-		progress.set('currentBook', props.bookName);
+		storage.set('progress..currentBook', props.bookName);
 		super();
 		this.state = {
 			book: props.book,
 			quick: true,
-			offset: p && p.books && p.books[props.bookName] && p.books[props.bookName].offset || 0,
-			timer: getSlowUpdateTimer(),
+			timer: null,
+			offset: props.offset || 0,
 			showMenu: false
 		};
 	}
 
+	componentDidMount() {
+		this.getSlowUpdateTimer();
+	}
+
 	getSlowUpdateTimer() {
-		return setTimeout(this.setState.bind(this, {quick: false, timer: null}), 0);
+		return setTimeout(() => {
+			this.setState({quick: false, timer: null})
+		}, 0);
 	}
 
 	updateOffset(sign) {
@@ -84,7 +86,7 @@ class BookReader extends React.Component {
 			translated: null,
 			quick: true
 		});
-		progress.setForCurrent('offset', offset);
+		storage.set(`progress..books..${this.props.bookName}..offset`, offset)
 	}
 	nextPage() {
 		this.updateOffset(+1);
@@ -95,11 +97,13 @@ class BookReader extends React.Component {
 	onWordPress(word) {
 		var isWord = null;
 		var translated;
+		console.log(word);
 		if (/^\w+$/.test(word)) {
 			isWord = true;
 			translated = translate({text: word});
 			LayoutAnimation.configureNext(easeInEaseOut);
 		}
+		console.log(translated);
 		this.setState({
 			showMenu: false,
 			translated: isWord && {
@@ -130,12 +134,6 @@ class BookReader extends React.Component {
 		}
 	}
 	render() {
-		if (!this.state.book) {
-			return <View>
-				<Text>Loading...</Text>
-			</View>;
-		}
-
 		// TODO padding
 		var progress = (this.state.offset / this.state.book.length) * (ScreenUtil.width - 14)
 		var text = this.state.book.slice(this.state.offset, this.state.offset + 1000);
