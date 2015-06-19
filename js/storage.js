@@ -27,15 +27,15 @@ async function set(path, val) {
 	}
 	var tail = chunks.pop();
 	var root = await get(head);
+	var cursor = root;
 	var key;
 	for (key of chunks) {
-		if (!root) {
-			root = {};
+		if (!cursor[key]) {
+			cursor[key] = {};
 		}
-		root = root[key];
+		cursor = cursor[key];
 	}
-	root = root || {};
-	root[tail] = val;
+	cursor[tail] = val;
 	return AsyncStorage.setItem(head, JSON.stringify(root));
 }
 

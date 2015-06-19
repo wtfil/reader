@@ -3,14 +3,12 @@ var {FileUtil, ScreenUtil} = require('NativeModules');
 var {LayoutAnimation, StyleSheet, Text, View, TouchableOpacity, AlertIOS} = React;
 var storage = require('./storage');
 var translate = require('./translate');
+var Settings = require('./Settings');
 var Menu = require('./Menu');
 
-function onError(err) {
-	console.error(err);
-}
 
-function getNewOffset({height, width, text, offset, sign}) {
-	var lh = 17, lw = 7;
+function getNewOffset({height, width, text, offset, sign, lineHeight, leterWidth}) {
+	var lh = lineHeight, lw = leterWidth;
 	var l = 0, tw = 0, w = 0, h = 0, i = offset;
 	while (h < height) {
 		if (text[i] === '\n') {
@@ -76,7 +74,9 @@ class BookReader extends React.Component {
 			text: this.state.book,
 			sign: sign,
 			offset: this.state.offset,
-			width: ScreenUtil.width - 10, //TODO 2*padding
+			lineHeight: Settings.fontSizes[this.props.settings.fontSize].lineHeight,
+			leterWidth: 8,
+			width: ScreenUtil.width - 15, //TODO 2*padding
 			height: ScreenUtil.height - 30
 		});
 		if (this.state.timer) {
@@ -90,8 +90,8 @@ class BookReader extends React.Component {
 		});
 		this.saveProgress(offset);
 	}
-	saveProgress(offset) {
-		storage.set(`progress..books..${this.props.bookName}..offset`, offset)
+	async saveProgress(offset) {
+		storage.set(`progress..books..${this.props.bookName}..offset`, offset);
 	}
 	nextPage() {
 		this.updateOffset(+1);
@@ -137,15 +137,10 @@ class BookReader extends React.Component {
 		}
 	}
 	getTextStyles() {
-		// todo move to settings
-		var fontSizes = {
-			small: 12,
-			middle: 15,
-			big: 18
-		};
-		var fontSize = this.props.settings &&
-			fontSizes[this.props.settings.fontSize] || 15;
-		return [styles.text, {fontSize: fontSize, lineHeight: fontSize}];
+		var config = this.props.settings
+			&& Settings.fontSizes[this.props.settings.fontSize];
+
+		return [styles.text, config];
 	}
 	goTo() {
 		AlertIOS.prompt(
@@ -154,11 +149,11 @@ class BookReader extends React.Component {
 			[
 				{text: 'Go', onPress: val => {
 					var offset = ~~(val / 100 * this.state.book.length);
+					this.saveProgress(offset);
 					this.setState({
 						offset: offset,
 						showMenu: false
 					});
-					this.saveProgress(offset);
 				}},
 				{text: 'Cancel'}
 			]
@@ -227,7 +222,7 @@ class BookReader extends React.Component {
 
 var styles = StyleSheet.create({
 	main: {
-		paddingHorizontal: 7,
+		paddingHorizontal: 15,
 		top: 0,
 		bottom: 0,
 		flex: 1,

@@ -4,9 +4,18 @@ var storage = require('./storage');
 var Menu = require('./Menu');
 
 var fontSizes = {
-	small: 12,
-	middle: 15,
-	big: 18
+	small: {
+		fontSize: 15,
+		lineHeight: 20
+	},
+	middle: {
+		fontSize: 18,
+		lineHeight: 24
+	},
+	big: {
+		fontSize: 21,
+		lineHeight: 27
+	}
 };
 var defaultSettings = {
 	fontSize: 'middle'
@@ -63,4 +72,5 @@ var styles = StyleSheet.create({
 	}
 });
 
+Settings.fontSizes = fontSizes;
 module.exports = Settings;
