@@ -7,7 +7,7 @@ class Route extends React.Component {}
 class ErrorRoute extends React.Component {
 	render() {
 		return <View>
-			{this.props.error}
+			<Text>{this.props.error.toString()}</Text>
 		</View>;
 	}
 }
@@ -27,12 +27,12 @@ class Router extends React.Component {
 	}
 
 	async navigate(name, props) {
-		var handler = this.getRoute(name);
+		var Handler = this.getRoute(name);
 		var asyncData;
 
-		if (handler.routerWillRun) {
+		if (Handler.routerWillRun) {
 			try {
-				asyncData = await handler.routerWillRun(props);
+				asyncData = await Handler.routerWillRun(props);
 			} catch (e) {
 				return this.setState({
 					routeHandler: ErrorRoute,
@@ -41,7 +41,7 @@ class Router extends React.Component {
 			};
 		}
 		this.setState({
-			routeHandler: handler,
+			routeHandler: Handler,
 			routeProps: {...props, ...asyncData}
 		});
 	}

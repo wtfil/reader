@@ -42,9 +42,11 @@ function getWords(text) {
 class BookReader extends React.Component {
 
 	static async routerWillRun(props) {
-		var book = await FileUtil.readFile('books/' + props.bookName);
-		var offset = await storage.get(`progress..books..${props.bookName}..offset`);
-		return {book, offset};
+		return {
+			book: await FileUtil.readFile('books/' + props.bookName),
+			offset: await storage.get(`progress..books..${props.bookName}..offset`),
+			settings: await storage.get('settings')
+		};
 	}
 
 	constructor(props) {
@@ -97,13 +99,11 @@ class BookReader extends React.Component {
 	onWordPress(word) {
 		var isWord = null;
 		var translated;
-		console.log(word);
 		if (/^\w+$/.test(word)) {
 			isWord = true;
 			translated = translate({text: word});
 			LayoutAnimation.configureNext(easeInEaseOut);
 		}
-		console.log(translated);
 		this.setState({
 			showMenu: false,
 			translated: isWord && {
@@ -133,6 +133,17 @@ class BookReader extends React.Component {
 			bookReader.nextPage();
 		}
 	}
+	getTextStyles() {
+		// todo move to settings
+		var fontSizes = {
+			small: 12,
+			middle: 15,
+			big: 18
+		};
+		var fontSize = this.props.settings &&
+			fontSizes[this.props.settings.fontSize] || 15;
+		return [styles.text, {fontSize: fontSize, lineHeight: fontSize}];
+	}
 	render() {
 		// TODO padding
 		var progress = (this.state.offset / this.state.book.length) * (ScreenUtil.width - 14)
@@ -146,12 +157,12 @@ class BookReader extends React.Component {
 		return <View ref="view" style={styles.main}>
 			{this.state.quick ?
 				<Text
-					style={styles.text}
+					style={this.getTextStyles()}
 					onResponderRelease={onWordTouchUp}
 					onStartShouldSetResponder={() => true}
 					children={text}
 				/> :
-				<Text style={styles.text}>
+				<Text style={this.getTextStyles()}>
 					{getWords(text).map((word, index) =>
 						<Text
 							style={this.state.translated && this.state.translated.word === word && {backgroundColor: '#FAFAC3'}}
@@ -217,9 +228,7 @@ var styles = StyleSheet.create({
 		fontFamily: 'Helvetica Neue',
 		bottom: 6,
 		top: 0,
-		position: 'absolute',
-		lineHeight: 15,
-		fontSize: 15
+		position: 'absolute'
 	},
 	progress: {
 		height: 3,

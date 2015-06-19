@@ -34,6 +34,7 @@ async function set(path, val) {
 		}
 		root = root[key];
 	}
+	root = root || {};
 	root[tail] = val;
 	return AsyncStorage.setItem(head, JSON.stringify(root));
 }

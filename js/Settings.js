@@ -1,44 +1,50 @@
 var React = require('react-native');
-var {StyleSheet, Text, View, SegmentedControlIOS, AsyncStorage} = React;
+var {StyleSheet, Text, View, SegmentedControlIOS} = React;
+var storage = require('./storage');
 var Menu = require('./Menu');
 
 var fontSizes = {
 	small: 12,
-	middle: 14,
-	big: 16
+	middle: 15,
+	big: 18
 };
 var defaultSettings = {
 	fontSize: 'middle'
 };
 
 class Settings extends React.Component {
-	constructor() {
-		super()
-		this.state = {
-			settings: null
-		};
-		AsyncStorage.getItem('settings', (err, settings) => {
-			settings = settings ? JSON.parse(settings) : defaultSettings;
-			this.setState({
-				settings: settings
-			});
-		});
+
+	static async routerWillRun() {
+		return {
+			settings: await storage.get('settings')
+		}
 	}
+
+	constructor(props) {
+		super()
+		this.state = props.settings || defaultSettings;
+	}
+
+	onFontChange(fontSize) {
+		this.setState({
+			fontSize: fontSize
+		});
+		storage.set('settings..fontSize', fontSize);
+	}
+
 	render() {
-		var settings = this.state.settings;
 		var fontSizesValues = Object.keys(fontSizes);
 		return <View>
 			<Menu/>
-			{settings &&
-				<View style={styles.options}>
-					<Text style={styles.title}>Font size</Text>
-					<SegmentedControlIOS
-						style={styles.fontSizes}
-						values={fontSizesValues}
-						selectedIndex={fontSizesValues.indexOf(settings.fontSize)}
-					/>
-				</View>
-			}
+			<View style={styles.options}>
+				<Text style={styles.title}>Font size</Text>
+				<SegmentedControlIOS
+					onValueChange={this.onFontChange.bind(this)}
+					style={styles.fontSizes}
+					values={fontSizesValues}
+					selectedIndex={fontSizesValues.indexOf(this.state.fontSize)}
+				/>
+			</View>
 		</View>;
 	}
 }
