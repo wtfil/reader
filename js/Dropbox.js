@@ -1,6 +1,6 @@
 var React = require('react-native');
 var qs = require('qs');
-var {StyleSheet, Text, View, Component, LinkingIOS, AsyncStorage, TouchableOpacity} = React;
+var {StyleSheet, Text, ListView, View, LinkingIOS, TouchableOpacity, AlertIOS, ActivityIndicatorIOS} = React;
 var {navigate, Link} = require('./Router');
 var {FileUtil} = require('NativeModules');
 var storage = require('./storage');
@@ -73,14 +73,7 @@ class DropboxApi {
 
 var api = new DropboxApi();
 
-async function downloadFile(path) {
-	var name = path.split('/').pop();
-	var text = await api.download(path);
-	await FileUtil.writeFile('books/' + name, text);
-	navigate('reader', {bookName: name});
-}
-
-class Dropbox extends Component {
+class Dropbox extends React.Component {
 	static async routerWillRun() {
 		return {
 			files: await api.content('/')
@@ -97,45 +90,89 @@ class Dropbox extends Component {
 	async updateFiles(cursor) {
 		this.setState({
 			files: await api.content(cursor),
-			cursor: cursor
+			cursor: cursor + '/'
 		});
+	}
+	getDs() {
+		var ds = new ListView.DataSource({
+			rowHasChanged: (r1, r2) => r1 !== r2
+		});
+		return ds.cloneWithRows(this.state.files);
+	}
+	formatPath(file) {
+		var path = file.path.replace(new RegExp('^' + this.state.cursor), '');
+		if (file.is_dir) {
+			path += '/';
+		}
+		return path;
 	}
 	back() {
 		var cursor = this.state.cursor.split('/').slice(0, -1).join('/');
 		this.updateFiles(cursor);
 	}
+
+	downloadFile(path) {
+		var name = path.split('/').pop();
+		AlertIOS.alert(
+			'Download',
+			`Download "${name}" in to your library?`,
+			[
+				{text: 'Ok', onPress: async () => {
+					this.setState({load: true});
+					var text = await api.download(path);
+					await FileUtil.writeFile('books/' + name, text);
+					this.setState({load: false});
+					navigate('reader', {bookName: name});
+				}},
+				{text: 'Cancel'}
+			]
+		);
+	}
+
 	render() {
-		return <View>
-			<TouchableOpacity onPress={this.back.bind(this)}>
-				<Text>Back</Text>
-			</TouchableOpacity>
-			<Link name="library">
-				<Text>Library</Text>
-			</Link>
-			<View style={styles.list}>
-				{this.state.files.map(file => {
-					return <View>
-						<TouchableOpacity onPress={() => {
-							if (file.is_dir) {
-								this.updateFiles(file.path);
-							} else {
-								downloadFile(file.path);
-							}
-						}}>
-							<Text>
-								{file.path.slice(1) + (file.is_dir ? '/' : '')}
-							</Text>
-						</TouchableOpacity>
-					</View>
-				})}
-			</View>
-		</View>;
+		return <ListView
+			style={styles.container}
+			dataSource={this.getDs()}
+			renderSectionHeader={() => {
+				return <View style={styles.head}>
+					<Link name="library">
+						<Text>Library / </Text>
+					</Link>
+					<Text style={styles.green}>Dropbox</Text>
+					<Text>{this.state.cursor}</Text>
+					{this.state.load &&
+						<Text style={styles.green}> Loading ... </Text>
+					}
+				</View>;
+			}}
+			renderRow={file => {
+				return <View>
+					<TouchableOpacity onPress={() => {
+						if (file.is_dir) {
+							this.updateFiles(file.path);
+						} else {
+							this.downloadFile(file.path);
+						}
+					}}>
+						<Text>{this.formatPath(file)}</Text>
+					</TouchableOpacity>
+				</View>
+			}}
+		/>
 	}
 }
 
 var styles = StyleSheet.create({
-	list: {
-		paddingTop: 10
+	container: {
+		paddingHorizontal: 7
+	},
+	green: {
+		color: 'green'
+	},
+	head: {
+		paddingBottom: 10,
+		fontSize: 18,
+		flexDirection: 'row'
 	}
 });
 

@@ -1,6 +1,6 @@
 var React = require('react-native');
 var {FileUtil, ScreenUtil} = require('NativeModules');
-var {LayoutAnimation, StyleSheet, Text, View} = React;
+var {LayoutAnimation, StyleSheet, Text, View, TouchableOpacity, AlertIOS} = React;
 var storage = require('./storage');
 var translate = require('./translate');
 var Menu = require('./Menu');
@@ -88,6 +88,9 @@ class BookReader extends React.Component {
 			translated: null,
 			quick: true
 		});
+		this.saveProgress(offset);
+	}
+	saveProgress(offset) {
 		storage.set(`progress..books..${this.props.bookName}..offset`, offset)
 	}
 	nextPage() {
@@ -144,6 +147,23 @@ class BookReader extends React.Component {
 			fontSizes[this.props.settings.fontSize] || 15;
 		return [styles.text, {fontSize: fontSize, lineHeight: fontSize}];
 	}
+	goTo() {
+		AlertIOS.prompt(
+			'Enter position in %',
+			(this.state.offset / this.state.book.length).toFixed(0),
+			[
+				{text: 'Go', onPress: val => {
+					var offset = ~~(val / 100 * this.state.book.length);
+					this.setState({
+						offset: offset,
+						showMenu: false
+					});
+					this.saveProgress(offset);
+				}},
+				{text: 'Cancel'}
+			]
+		)
+	}
 	render() {
 		// TODO padding
 		var progress = (this.state.offset / this.state.book.length) * (ScreenUtil.width - 14)
@@ -194,6 +214,13 @@ class BookReader extends React.Component {
 					<Menu {...this.props}/>
 				</View>
 			}
+			{this.state.showMenu &&
+				<View style={styles.bookMenu}>
+					<TouchableOpacity onPress={this.goTo.bind(this)}>
+						<Text>Go to</Text>
+					</TouchableOpacity>
+				</View>
+			}
 		</View>;
   	}
 }
@@ -204,6 +231,14 @@ var styles = StyleSheet.create({
 		top: 0,
 		bottom: 0,
 		flex: 1,
+	},
+	bookMenu: {
+		position: 'absolute',
+		left: 0,
+		backgroundColor: '#6CE8F8',
+		padding: 10,
+		right: -14,
+		bottom: 0
 	},
 	menu: {
 		position: 'absolute',
