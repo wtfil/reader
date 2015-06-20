@@ -5,28 +5,29 @@ var storage = require('./storage');
 var translate = require('./translate');
 var Settings = require('./Settings');
 var Menu = require('./Menu');
+var fontWidths = require('./font-widths');
 
-
-function getNewOffset({height, width, text, offset, sign, lineHeight, leterWidth}) {
-	var lh = lineHeight, lw = leterWidth;
+function getNewOffset({height, width, text, offset, sign, lineHeight, fontSize}) {
+	var lh = lineHeight;
+	var lws = fontWidths[fontSize];
 	var l = 0, tw = 0, w = 0, h = 0, i = offset;
-	while (h < height) {
+	while (h < height - lh) {
 		if (text[i] === '\n') {
 			h += lh;
 			w = 0;
 			l = 0;
 		} else if (text[i] === ' ') {
-			tw = (l + 1) * lw;
-			if (tw + w > width) {
-				l = 0;
-				w = tw;
+			if (l + w > width) {
+				w = l;
 				h += lh;
-			} else {
 				l = 0;
-				w += tw;
+			} else {
+				l += lws[' '];
+				w += l;
+				l = 0;
 			}
 		} else {
-			l ++;
+			l += lws[text[i]] || 6;
 		}
 		i += sign;
 	}
@@ -74,10 +75,10 @@ class BookReader extends React.Component {
 			text: this.state.book,
 			sign: sign,
 			offset: this.state.offset,
-			lineHeight: Settings.fontSizes[this.props.settings.fontSize].lineHeight,
-			leterWidth: 8,
-			width: ScreenUtil.width - 15, //TODO 2*padding
-			height: ScreenUtil.height - 30
+			width: ScreenUtil.width - 30, //TODO 2*padding
+			height: ScreenUtil.height - 30,
+
+			...Settings.fontSizes[this.props.settings.fontSize]
 		});
 		if (this.state.timer) {
 			clearTimeout(this.state.timer);
