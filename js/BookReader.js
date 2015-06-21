@@ -4,35 +4,8 @@ var {LayoutAnimation, StyleSheet, Text, View, TouchableOpacity, AlertIOS} = Reac
 var storage = require('./storage');
 var translate = require('./translate');
 var Settings = require('./Settings');
+var mesure = require('./mesure-text');
 var Menu = require('./Menu');
-var fontWidths = require('./font-widths');
-
-function getNewOffset({height, width, text, offset, sign, lineHeight, fontSize}) {
-	var lh = lineHeight;
-	var lws = fontWidths[fontSize];
-	var l = 0, tw = 0, w = 0, h = 0, i = offset;
-	while (h < height - lh) {
-		if (text[i] === '\n') {
-			h += lh;
-			w = 0;
-			l = 0;
-		} else if (text[i] === ' ') {
-			if (l + w > width) {
-				w = l;
-				h += lh;
-				l = 0;
-			} else {
-				l += lws[' '];
-				w += l;
-				l = 0;
-			}
-		} else {
-			l += lws[text[i]] || 6;
-		}
-		i += sign;
-	}
-	return i + (sign < 0 ? 2 : 0);
-}
 
 function getWords(text) {
 	return text.split(/([^\w])/);
@@ -53,25 +26,25 @@ class BookReader extends React.Component {
 		super();
 		this.state = {
 			book: props.book,
-			quick: true,
-			timer: null,
+			/*quick: true,*/
+			/*timer: null,*/
 			offset: props.offset || 0,
 			showMenu: false
 		};
 	}
 
-	componentDidMount() {
-		this.getSlowUpdateTimer();
-	}
+	/*componentDidMount() {*/
+	/*this.getSlowUpdateTimer();*/
+	/*}*/
 
-	getSlowUpdateTimer() {
-		return setTimeout(() => {
-			this.setState({quick: false, timer: null})
-		}, 0);
-	}
+	/*getSlowUpdateTimer() {*/
+	/*return setTimeout(() => {*/
+	/*this.setState({quick: false, timer: null})*/
+	/*}, 0);*/
+	/*}*/
 
 	updateOffset(sign) {
-		var offset = getNewOffset({
+		var offset = mesure.getNewOffset({
 			text: this.state.book,
 			sign: sign,
 			offset: this.state.offset,
@@ -80,14 +53,14 @@ class BookReader extends React.Component {
 
 			...Settings.fontSizes[this.props.settings.fontSize]
 		});
-		if (this.state.timer) {
-			clearTimeout(this.state.timer);
-		}
+		/*if (this.state.timer) {*/
+		/*clearTimeout(this.state.timer);*/
+		/*}*/
 		this.setState({
-			timer: this.getSlowUpdateTimer(),
+			/*timer: this.getSlowUpdateTimer(),*/
 			offset: offset,
 			translated: null,
-			quick: true
+			/*quick: true*/
 		});
 		this.saveProgress(offset);
 	}
@@ -122,6 +95,7 @@ class BookReader extends React.Component {
 	showMenu() {
 		this.setState({showMenu: true});
 	}
+	/*
 	onWordTouchUp(e, bookReader) {
 		var touch = e.touchHistory.touchBank[1];
 		var diff = touch.currentPageX - touch.startPageX;
@@ -135,6 +109,32 @@ class BookReader extends React.Component {
 			bookReader.prevPage();
 		} else if (diff < 0) {
 			bookReader.nextPage();
+		}
+	}
+	*/
+	onTextTouch(e) {
+		var touch = e.touchHistory.touchBank[1];
+		var diff = touch.currentPageX - touch.startPageX;
+		var word;
+		if (Math.abs(diff) < 30) {
+			if (touch.currentTimeStamp - touch.startTimeStamp > 300) {
+				bookReader.showMenu();
+			} else {
+				word = mesure.getWordByOffset({
+					text: this.state.book,
+					offset: this.state.offset,
+					x: touch.currentPageX - 15, // padding
+					y: touch.currentPageY - 30, // top
+					width: ScreenUtil.width - 30, //TODO 2*padding
+
+					...Settings.fontSizes[this.props.settings.fontSize]
+				});
+				console.log('word press', touch.currentPageX, touch.currentPageY);
+			}
+		} else if (diff > 0) {
+			this.prevPage();
+		} else if (diff < 0) {
+			this.nextPage();
 		}
 	}
 	getTextStyles() {
@@ -169,8 +169,7 @@ class BookReader extends React.Component {
 		function onWordTouchUp(e) {
 			_this.onWordTouchUp.call(this, e, _this);
 		}
-
-		return <View ref="view" style={styles.main}>
+			/*
 			{this.state.quick ?
 				<Text
 					style={this.getTextStyles()}
@@ -190,6 +189,15 @@ class BookReader extends React.Component {
 					)}
 				</Text>
 			}
+			*/
+
+		return <View ref="view" style={styles.main}>
+			<Text
+				style={this.getTextStyles()}
+				onResponderRelease={this.onTextTouch.bind(this)}
+				onStartShouldSetResponder={() => true}
+				children={text}
+			/>
 			<View style={styles.progress}>
 				<View style={[styles.progressIndecator, {left: progress}]} />
 				<Text style={styles.position}>{Math.round(this.state.offset / this.state.book.length * 100)}%</Text>
