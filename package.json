@@ -6,8 +6,6 @@
     "start": "node_modules/react-native/packager/packager.sh"
   },
   "dependencies": {
-    "qs": "^3.1.0",
-    "react-native": "git@github.com:facebook/react-native.git",
-    "regenerator": "^0.8.29"
+    "react-native": "^0.12.0"
   }
 }

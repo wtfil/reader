@@ -11,10 +11,10 @@ async function get(path) {
 		return null;
 	};
 	for (key of chunks) {
-		root = root[key];
 		if (!root) {
 			return null;
 		}
+		root = root[key];
 	}
 	return root;
 }

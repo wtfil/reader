@@ -1,13 +1,15 @@
 var React = require('react-native');
-var {TouchableOpacity, Navigator, View} = React;
+var {TouchableOpacity, Navigator, View, Text} = React;
 var instance;
 
 class Route extends React.Component {}
 
 class ErrorRoute extends React.Component {
 	render() {
-		return <View>
-			<Text>{this.props.error.toString()}</Text>
+		return <View style={styles.error}>
+			<Text style={styles.errorText}>
+				{this.props.error.toString()}
+			</Text>
 		</View>;
 	}
 }
@@ -59,15 +61,12 @@ class Router extends React.Component {
 	}
 
 	render() {
-		return this.state.routeHandler &&
-			<this.state.routeHandler {...this.state.routeProps} />;
-		/*
-		children.forEach(item => {
-			if (item.type.prototype.constructor !== Route) {
-				throw new Error(`Only <Route/> could be passed to Router, but <${item.type.prototype.constructor.name}/> given`);
-			}
-		});
-		*/
+		try {
+			return this.state.routeHandler &&
+				<this.state.routeHandler {...this.state.routeProps} />;
+		} catch (e) {
+			return <ErrorRoute error={e} />
+		};
 	}
 
 }
@@ -89,4 +88,17 @@ function navigate(...args) {
 	instance.navigate(...args);
 }
 
-module.exports = { Route, Router, navigate, Link };
+var styles = {
+	error: {
+		flex: 1,
+		alignItems: 'center',
+		justifyContent: 'center',
+		backgroundColor: '#FE2E64',
+	},
+	errorText: {
+		color: '#333',
+		fontSize: 21
+	}
+}
+
+module.exports = {Route, Router, navigate, Link};

@@ -35,14 +35,14 @@ class Library extends React.Component {
 		return <View style={styles.main}>
 			<ListView
 				dataSource={this.state.books}
-				renderSectionHeader={() => {
-					return <View style={styles.header}>
+				renderHeader={() =>
+					<View style={styles.header}>
 					 	 <Text style={styles.green}>Your library / </Text>
 						 <Link name="dropbox">
 						 	<Text>Dropbox</Text>
 						 </Link>
 					</View>
-				}}
+				}
 				renderRow={bookName =>
 					<Link name="reader" query={{bookName: bookName}}>
 						<View style={styles.libraryRow}>
