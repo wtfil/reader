@@ -37,7 +37,7 @@ class Library extends React.Component {
 				dataSource={this.state.books}
 				renderHeader={() =>
 					<View style={styles.header}>
-					 	 <Text style={styles.green}>Your library / </Text>
+					 	 <Text style={styles.green}>Library / </Text>
 						 <Link name="dropbox">
 						 	<Text>Dropbox</Text>
 						 </Link>

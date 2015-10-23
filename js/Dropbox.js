@@ -29,8 +29,7 @@ class DropboxApi {
 			LinkingIOS.addEventListener('url', e => {
 				var query = qs.parse(e.url.split('#')[1]);
 				LinkingIOS.removeEventListener('url');
-				storage.set('dropbox', query);
-				resolve(query.access_token);
+				resolve(query);
 			});
 			LinkingIOS.openURL(url);
 		});
@@ -39,32 +38,35 @@ class DropboxApi {
 		return this.token;
 	}
 
-	async call({endpoint, method, origin}) {
+	async call({endpoint, body, origin}) {
 		var token = await this.getToken();
-		return fetch(
-			`https://${origin}.dropbox.com/1/${endpoint}`,
-			{
-				method: method,
-				headers: {
-					'Authorization': `Bearer ${token}`
-				}
-			}
-		);
+		return fetch(`https://${origin}.dropboxapi.com/2/${endpoint}`, {
+			method: 'post',
+			headers: {
+				'Content-Type': 'application/json',
+				'Authorization': `Bearer ${token}`
+			},
+			body: JSON.stringify(body)
+		});
 	}
 	async content(path) {
-		var res = await this.call({
-			endpoint: 'metadata/auto' + path,
-			method: 'get',
-			origin: 'api'
+		var data = await this.call({
+			endpoint: 'files/list_folder',
+			origin: 'api',
+			body: {path}
+		}).then(res => res.json()).then(data => {
+			if (data.error) {
+				throw new Error('Dropbox: can not get content');
+			}
+			return data;
 		});
-		var json = await res.json();
-		return json.contents;
+		return data.entries;
 	}
 	download(path) {
 		return this.call({
-			endpoint: 'files/auto/' + path,
-			method: 'get',
-			origin: 'api-content'
+			endpoint: 'files/download',
+			origin: 'content',
+			body: {path}
 		}).then(res => {
 			return res.text();
 		});
@@ -76,7 +78,7 @@ var api = new DropboxApi();
 class Dropbox extends React.Component {
 	static async routerWillRun() {
 		return {
-			files: await api.content('/')
+			files: await api.content('')
 		};
 	}
 
@@ -84,7 +86,7 @@ class Dropbox extends React.Component {
 		super();
 		this.state = {
 			files: props.files,
-			cursor: '/'
+			cursor: ''
 		};
 	}
 	async updateFiles(cursor) {
@@ -100,8 +102,8 @@ class Dropbox extends React.Component {
 		return ds.cloneWithRows(this.state.files);
 	}
 	formatPath(file) {
-		var path = file.path.replace(new RegExp('^' + this.state.cursor), '');
-		if (file.is_dir) {
+		var path = file.path_lower.replace(new RegExp('^' + this.state.cursor), '');
+		if (file['.tag'] === 'folder') {
 			path += '/';
 		}
 		return path;
@@ -118,9 +120,14 @@ class Dropbox extends React.Component {
 			`Download "${name}" in to your library?`,
 			[
 				{text: 'Ok', onPress: async () => {
+					var text;
 					this.setState({load: true});
-					var text = await api.download(path);
-					await FileUtil.writeFile('books/' + name, text);
+					try {
+						text = await api.download(path);
+						await FileUtil.writeFile('books/' + name, text);
+					} catch (e) {
+						console.log(e);
+					};
 					this.setState({load: false});
 					navigate('reader', {bookName: name});
 				}},
@@ -133,7 +140,7 @@ class Dropbox extends React.Component {
 		return <ListView
 			style={styles.container}
 			dataSource={this.getDs()}
-			renderSectionHeader={() => {
+			renderHeader={() => {
 				return <View style={styles.head}>
 					<Link name="library">
 						<Text>Library / </Text>
@@ -148,10 +155,10 @@ class Dropbox extends React.Component {
 			renderRow={file => {
 				return <View>
 					<TouchableOpacity onPress={() => {
-						if (file.is_dir) {
-							this.updateFiles(file.path);
+						if (file['.tag'] === 'folder') {
+							this.updateFiles(file.path_lower);
 						} else {
-							this.downloadFile(file.path);
+							this.downloadFile(file.path_lower);
 						}
 					}}>
 						<Text>{this.formatPath(file)}</Text>
