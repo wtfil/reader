@@ -29,7 +29,7 @@ class DropboxApi {
 			LinkingIOS.addEventListener('url', e => {
 				var query = qs.parse(e.url.split('#')[1]);
 				LinkingIOS.removeEventListener('url');
-				AsyncStorage.setItem('dropbox', JSON.stringify(query));
+				storage.set('dropbox', query);
 				resolve(query.access_token);
 			});
 			LinkingIOS.openURL(url);
