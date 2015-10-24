@@ -23,6 +23,7 @@
 		13B07FC11A68108700A75B9A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
 		146834051AC3E58100842450 /* libReact.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 146834041AC3E56700842450 /* libReact.a */; };
 		832341BD1AAA6AB300B99B32 /* libRCTText.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 832341B51AAA6A8300B99B32 /* libRCTText.a */; };
+		8806ADAD1BDB82FD006DFE09 /* ScreenUtil.m in Sources */ = {isa = PBXBuildFile; fileRef = 8806ADAC1BDB82FD006DFE09 /* ScreenUtil.m */; settings = {ASSET_TAGS = (); }; };
 		886C8CA71BD9787800F2B728 /* FileUtil.m in Sources */ = {isa = PBXBuildFile; fileRef = 886C8CA61BD9787800F2B728 /* FileUtil.m */; settings = {ASSET_TAGS = (); }; };
 /* End PBXBuildFile section */
 
@@ -128,6 +129,8 @@
 		146833FF1AC3E56700842450 /* React.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = React.xcodeproj; path = "../node_modules/react-native/React/React.xcodeproj"; sourceTree = "<group>"; };
 		78C398B01ACF4ADC00677621 /* RCTLinking.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RCTLinking.xcodeproj; path = "../node_modules/react-native/Libraries/LinkingIOS/RCTLinking.xcodeproj"; sourceTree = "<group>"; };
 		832341B01AAA6A8300B99B32 /* RCTText.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RCTText.xcodeproj; path = "../node_modules/react-native/Libraries/Text/RCTText.xcodeproj"; sourceTree = "<group>"; };
+		8806ADAB1BDB82FD006DFE09 /* ScreenUtil.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ScreenUtil.h; path = modules/ScreenUtil.h; sourceTree = "<group>"; };
+		8806ADAC1BDB82FD006DFE09 /* ScreenUtil.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ScreenUtil.m; path = modules/ScreenUtil.m; sourceTree = "<group>"; };
 		886C8CA51BD9787800F2B728 /* FileUtil.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = FileUtil.h; path = modules/FileUtil.h; sourceTree = "<group>"; };
 		886C8CA61BD9787800F2B728 /* FileUtil.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = FileUtil.m; path = modules/FileUtil.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -245,6 +248,8 @@
 				13B07FB71A68108700A75B9A /* main.m */,
 				886C8CA51BD9787800F2B728 /* FileUtil.h */,
 				886C8CA61BD9787800F2B728 /* FileUtil.m */,
+				8806ADAB1BDB82FD006DFE09 /* ScreenUtil.h */,
+				8806ADAC1BDB82FD006DFE09 /* ScreenUtil.m */,
 			);
 			name = Reader;
 			sourceTree = "<group>";
@@ -532,6 +537,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				886C8CA71BD9787800F2B728 /* FileUtil.m in Sources */,
+				8806ADAD1BDB82FD006DFE09 /* ScreenUtil.m in Sources */,
 				13B07FBC1A68108700A75B9A /* AppDelegate.m in Sources */,
 				13B07FC11A68108700A75B9A /* main.m in Sources */,
 			);

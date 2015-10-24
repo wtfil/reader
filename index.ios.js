@@ -12,6 +12,7 @@ var {Route, Router, navigate} = require('./js/Router');
 class App extends React.Component {
 	async componentDidMount() {
 		var currentBook = await storage.get('progress..currentBook');
+		return navigate('library')
 		if (currentBook) {
 			navigate('reader', {bookName: currentBook});
 		} else {
@@ -20,7 +21,7 @@ class App extends React.Component {
 	}
 	render() {
 		return <View style={styles.container}>
-			<Router>
+			<Router handleUncaught >
 				<Route name="library" handler={Library} />
 				<Route name="reader" handler={BookReader} />
 				<Route name="settings" handler={Settings} />

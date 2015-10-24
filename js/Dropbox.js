@@ -38,16 +38,28 @@ class DropboxApi {
 		return this.token;
 	}
 
-	async call({endpoint, body, origin}) {
+	async call({endpoint, body, origin, args}) {
 		var token = await this.getToken();
+		var headers = {
+			'Authorization': `Bearer ${token}`
+		};
+		if (args) {
+			headers['Dropbox-API-Arg'] = JSON.stringify(args);
+		} else {
+			headers['Content-Type'] = 'application/json'
+		}
 		return fetch(`https://${origin}.dropboxapi.com/2/${endpoint}`, {
 			method: 'post',
-			headers: {
-				'Content-Type': 'application/json',
-				'Authorization': `Bearer ${token}`
-			},
-			body: JSON.stringify(body)
-		});
+			headers,
+			body: body && JSON.stringify(body)
+		}).then(res => {
+			if (res.status >= 400) {
+				return new Promise((_, reject) => {
+					res.text().then(reject);
+				});
+			}
+			return res;
+		})
 	}
 	async content(path) {
 		var data = await this.call({
@@ -66,7 +78,7 @@ class DropboxApi {
 		return this.call({
 			endpoint: 'files/download',
 			origin: 'content',
-			body: {path}
+			args: {path}
 		}).then(res => {
 			return res.text();
 		});

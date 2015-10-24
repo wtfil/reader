@@ -22,6 +22,24 @@ class Router extends React.Component {
 		}
 		super();
 		instance = this;
+		if (props.handleUncaught) {
+			const {constructor} = React.Component.prototype;
+			React.Component.prototype.constructor = function () {
+				var render = this.render.bind(this);
+				this.render = function () {
+					try {
+						return render();
+					} catch (error) {
+						instance.setState({
+							routeHandler: ErrorRoute,
+							routeProps: {error}
+						});
+						return null;
+					};
+				}
+				constructor.call(this);
+			};
+		}
 		this.state = {
 			routeHandler: null,
 			routeProps: {}
@@ -61,12 +79,8 @@ class Router extends React.Component {
 	}
 
 	render() {
-		try {
-			return this.state.routeHandler &&
-				<this.state.routeHandler {...this.state.routeProps} />;
-		} catch (e) {
-			return <ErrorRoute error={e} />
-		};
+		return this.state.routeHandler &&
+			<this.state.routeHandler {...this.state.routeProps} />;
 	}
 
 }

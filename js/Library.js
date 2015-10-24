@@ -44,7 +44,7 @@ class Library extends React.Component {
 					</View>
 				}
 				renderRow={bookName =>
-					<Link name="reader" query={{bookName: bookName}}>
+					<Link name="reader" query={{bookName}}>
 						<View style={styles.libraryRow}>
 							<Text>{bookName}</Text>
 						</View>
