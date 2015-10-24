@@ -78,7 +78,7 @@ class BookReader extends React.Component {
 			width: ScreenUtil.width - 30, //TODO 2*padding
 			height: ScreenUtil.height - 30,
 
-			...Settings.fontSizes[this.props.settings.fontSize]
+			...this.getFontSize()
 		});
 		if (this.state.timer) {
 			clearTimeout(this.state.timer);
@@ -137,11 +137,14 @@ class BookReader extends React.Component {
 			bookReader.nextPage();
 		}
 	}
-	getTextStyles() {
-		var config = this.props.settings
-			&& Settings.fontSizes[this.props.settings.fontSize];
 
-		return [styles.text, config];
+	getFontSize() {
+		const {settings} = this.props;
+		const fontSize = settings ? settings.fontSizes : 'middle';
+		return Settings.fontSizes[fontSize];
+	}
+	getTextStyles() {
+		return [styles.text, this.getFontSize()];
 	}
 	goTo() {
 		AlertIOS.prompt(
