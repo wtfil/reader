@@ -241,8 +241,9 @@ var styles = StyleSheet.create({
 	},
 	menu: {
 		position: 'absolute',
+		flex: 1,
 		left: 0,
-		right: -14,
+		right: -30,
 		top: 0
 	},
 	position: {
@@ -268,7 +269,7 @@ var styles = StyleSheet.create({
 		height: 3,
 		position: 'absolute',
 		left: 7,
-		right: 0,
+		right: 7,
 		bottom: 7,
 		borderWidth: 1
 	},
