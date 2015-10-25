@@ -1,5 +1,6 @@
 var React = require('react-native');
 var {TouchableOpacity, Navigator, View, Text} = React;
+var storage = require('./storage');
 var instance;
 
 class Route extends React.Component {}
@@ -46,6 +47,19 @@ class Router extends React.Component {
 		};
 	}
 
+	async componentWillMount() {
+		var lastState = await storage.get('router');
+		var route, props;
+		if (lastState) {
+			route = lastState.route;
+			props = lastState.props;
+		} else {
+			route = [].concat(this.props.children)
+				.filter(item => item.props.initial)[0].props.name;
+		}
+		this.navigate(route, props);
+	}
+
 	async navigate(name, props) {
 		var Handler = this.getRoute(name);
 		var asyncData;
@@ -59,6 +73,12 @@ class Router extends React.Component {
 					routeProps: {error: e}
 				});
 			};
+		}
+		if (this.props.saveLocation) {
+			await storage.set('router', {
+				route: name,
+				props: props
+			});
 		}
 		this.setState({
 			routeHandler: Handler,
